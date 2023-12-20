@@ -2,8 +2,6 @@
 import pygame
 from scripts.menu import menu_scene
 
-# from scripts.menu import menu_scene
-
 # проводим инициализацию pygame
 pygame.init()
 
