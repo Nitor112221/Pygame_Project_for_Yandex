@@ -9,8 +9,8 @@ pygame.init()
 info = pygame.display.Info()
 
 # получение ширины и высоты монитора
-screen_width = 1900
-screen_height = 1000
+screen_width = 1920
+screen_height = 1080
 screen = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 
 # экран на котором всё будет рисоватся, а потом оно растянется
