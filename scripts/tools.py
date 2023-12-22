@@ -3,7 +3,13 @@ import os
 import sys
 
 
-def load_image(name, colorkey=None):
+def load_image(name: str, colorkey=None) -> pygame.Surface:  # функция загрузки изображения
+    """
+    Функция загрузки изображения
+    :param name: str
+    :param colorkey: int or None
+    :return: pygame.Surface
+    """
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
