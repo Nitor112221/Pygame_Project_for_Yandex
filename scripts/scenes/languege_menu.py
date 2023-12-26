@@ -1,4 +1,5 @@
 import pygame
+import random
 
 # Инициализация Pygame
 pygame.init()
@@ -37,14 +38,15 @@ class LanguegeScene:
                                                                self.selected_language) * 50 + 40))
             underline = pygame.Surface((selected_text.get_width(), 4))
             underline.fill(pygame.Color((0, 0, 0)))
-            underline_pos = (selected_rect.x, selected_rect.bottom - 5)
+            underline_pos = (selected_rect.x, selected_rect.bottom - 50)
             surface.blit(underline, underline_pos)
 
-    def handle_event(self, event, surface: pygame.Surface):
+    def handle_event(self, event, surface: pygame.Surface, screen):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos()  # Используем координаты мыши относительно окна
+            mouse_pos = self.hover(pygame.mouse.get_pos(), screen, surface)
+            # Используем координаты мыши относительно окна
             if self.is_inside_menu(mouse_pos, surface):
-                index = (mouse_pos[1] - round(surface.get_height() * 0.2)) // 50
+                index = (mouse_pos[1] - round(surface.get_height() * 0.275)) // 50
                 if 0 <= index < len(self.languages):
                     self.selected_language = self.languages[index]
                     print(f"Selected Language: {self.selected_language}")
@@ -55,3 +57,9 @@ class LanguegeScene:
     def is_inside_menu(self, mouse_pos, surface: pygame.Surface) -> bool:
         menu_rect = pygame.Rect(surface.get_width() * 0.2, surface.get_height() * 0.2, self.width, self.height)
         return menu_rect.collidepoint(mouse_pos)
+
+    @staticmethod
+    def hover(mos_pos: tuple[int, int], screen: pygame.Surface, virtual_surface: pygame.Surface) -> tuple[int, int]:
+        x_coeff = virtual_surface.get_width() / screen.get_width()
+        y_coeff = virtual_surface.get_height() / screen.get_height()
+        return int(mos_pos[0] * x_coeff), int(mos_pos[1] * y_coeff)

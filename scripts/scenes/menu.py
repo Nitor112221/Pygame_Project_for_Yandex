@@ -105,7 +105,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                     running = False
                     switch_scene(None)
             if extra_scene is not None:
-                if extra_scene.handle_event(event, screen) == 'Close':
+                if extra_scene.handle_event(event, virtual_surface, screen) == 'Close':
                     extra_scene = None
                     menu.is_action_menu = True
         # отрисовываем всё на сцене
