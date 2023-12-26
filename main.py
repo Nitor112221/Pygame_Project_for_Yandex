@@ -1,6 +1,6 @@
 # загружаем нужные библиотеки и модули
 import pygame
-from scripts.menu import menu_scene
+from scripts.scenes.menu import menu_scene
 
 # проводим инициализацию pygame
 pygame.init()
@@ -9,8 +9,8 @@ pygame.init()
 info = pygame.display.Info()
 
 # получение ширины и высоты монитора
-screen_width = 1920
-screen_height = 1080
+screen_width = pygame.display.Info().current_w
+screen_height = pygame.display.Info().current_h
 screen = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 
 # экран на котором всё будет рисоватся, а потом оно растянется
