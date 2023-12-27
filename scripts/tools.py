@@ -23,3 +23,44 @@ def load_image(name: str, colorkey=None) -> pygame.Surface:  # функция з
     else:
         image = image.convert_alpha()
     return image
+
+
+default_options_file = 'data/default_options.txt'
+user_options_file = 'data/options.txt'
+
+
+def load_default_options():
+    # Загрузка настроек по умолчанию из файла
+    default_options = {}
+    with open(default_options_file, 'r', encoding='UTF-8') as file:
+        for line in file:
+            key, value = line.strip().split()
+            default_options[key] = value
+    return default_options
+
+
+def load_user_options():
+    default_options = load_default_options()
+    # Загрузка пользовательских настроек из файла, с добавлением отсутствующих значений из default_options
+    user_options = default_options.copy()
+    try:
+        with open(user_options_file, 'r', encoding='UTF-8') as file:
+            for line in file:
+                key, value = line.strip().split()
+                user_options[key] = value
+    except FileNotFoundError:
+        pass  # Если файл не найден, используются только значения по умолчанию
+
+    # Добавление отсутствующих настроек из default_options
+    for key, value in user_options.items():
+        if key not in user_options:
+            user_options[key] = value
+
+    return user_options
+
+
+def save_user_options(user_options):
+    # Сохранение пользовательских настроек в файл
+    with open(user_options_file, 'w', encoding='UTF-8') as file:
+        for key, value in user_options.items():
+            file.write(f"{key} {value}\n")

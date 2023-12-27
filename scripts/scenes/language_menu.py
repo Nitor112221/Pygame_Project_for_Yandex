@@ -1,15 +1,15 @@
 import pygame
-import random
-
+import scripts.tools as tools
 # Инициализация Pygame
 pygame.init()
 
 
-class LanguegeScene:
-    def __init__(self, width: int, height: int):
+class LanguageScene:
+    def __init__(self, width: int, height: int, settings: dict):
         self.width, self.height = round(width * 0.6), round(height * 0.6)
         self.languages = ["English", "Русский"]  # Список поддерживаемых языков
-        self.selected_language = None
+        self.settings = settings
+        self.selected_language = settings['language']
 
     def draw(self, surface: pygame.Surface):  # Метод отрисовки меню выбора языков
         scene_surface = pygame.Surface((self.width, self.height))
@@ -49,9 +49,11 @@ class LanguegeScene:
                 index = (mouse_pos[1] - round(surface.get_height() * 0.275)) // 50
                 if 0 <= index < len(self.languages):
                     self.selected_language = self.languages[index]
+                    self.settings['language'] = self.selected_language
                     print(f"Selected Language: {self.selected_language}")
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
+                tools.save_user_options(self.settings)
                 return 'Close'
 
     def is_inside_menu(self, mouse_pos, surface: pygame.Surface) -> bool:

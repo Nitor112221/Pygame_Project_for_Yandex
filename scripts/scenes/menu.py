@@ -1,6 +1,7 @@
 import pygame
 import scripts.tools as tools
-from scripts.scenes.languege_menu import LanguegeScene
+from scripts.scenes.language_menu import LanguageScene
+from data.language import russian, english
 
 pygame.init()
 
@@ -9,13 +10,13 @@ font = pygame.font.SysFont('Comic Sans MS', 72)  # шрифт для текст�
 
 class Menu:  # класс отвечающий за кнопки в меню
     def __init__(self):
-        self.option_surflaces: list[pygame.Surface] = list()  # список с поверхностями текста
+        self.option_surflaces: list[str] = list()  # список с поверхностями текста
         self.option_callback = list()  # список с функциями которые принадлежат кнопкам
         self.current_option_index = 0  # текущий элемент
         self.is_action_menu = True  # говорит активно ли сейчас меню, что бы блокировать его в некоторые моменты
 
     def append_option(self, option: str, callback) -> None:  # метод для дабавление разделов в menu
-        self.option_surflaces.append(font.render(option, True, pygame.Color((255, 255, 255))))
+        self.option_surflaces.append(option)
         self.option_callback.append(callback)
 
     def switch(self, direction: int) -> None:  # переключение текущего элемента
@@ -33,13 +34,18 @@ class Menu:  # класс отвечающий за кнопки в меню
         y_coeff = virtual_surface.get_height() / screen.get_height()
         return int(mos_pos[0] * x_coeff), int(mos_pos[1] * y_coeff)
 
-    def draw(self, surface: pygame.Surface, option_y_padding: int, screen: pygame.Surface) -> None:
+    def draw(self, surface: pygame.Surface, option_y_padding: int, screen: pygame.Surface, settings: dict) -> None:
         # метод отрисовки всех элементов
         # координаты расположения меню относительно виртуальнйо поверхности
         x, y = surface.get_width() * 0.025, surface.get_height() * 0.555
+        if settings['language'] == 'English':
+            lang = english.eng
+        elif settings['language'] == 'Русский':
+            lang = russian.rus
 
         for i, option in enumerate(self.option_surflaces):  # проходимся по всем повехностям
-            # создаём прямоугольник описывающий текст
+            # создаём прямоугольник описывающий текст2
+            option = font.render(lang[option], True, pygame.Color((255, 255, 255)))
             option_rect = option.get_rect()
             option_rect.topleft = (x, y + i * option_y_padding)
             if self.is_action_menu:
@@ -58,26 +64,28 @@ class Menu:  # класс отвечающий за кнопки в меню
         # метод находящий элемент на который указывает мышь
         if self.is_action_menu:
             for i, option in enumerate(self.option_surflaces):
+                option = font.render(option, True, pygame.Color((255, 255, 255)))
                 option_rect = option.get_rect()
                 option_rect.topleft = (x, y + i * option_y_padding)
                 if option_rect.collidepoint(self.hover(pygame.mouse.get_pos(), screen, surf)):
                     return self.select()
 
 
-def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene) -> None:  # меню игры
+def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
+    # меню игры
     extra_scene = None  # переменная хранящая текущую доп сцену (с выбором языка или настроек)
     menu = Menu()  # создание меню
 
-    def open_languege_scene():  # функция открывающая окно выбора языка и блокирующая меню
+    def open_language_scene():  # функция открывающая окно выбора языка и блокирующая меню
         nonlocal extra_scene, menu, virtual_surface
-        extra_scene = LanguegeScene(*virtual_surface.get_size())  # создание меню выбора языков
+        extra_scene = LanguageScene(*virtual_surface.get_size(), settings)  # создание меню выбора языков
         menu.is_action_menu = False  # блокировка меню
 
     # создание кнопок меню
-    menu.append_option('Играть', lambda: print('нажата кнопка Играть'))  # действий пока нет
-    menu.append_option('Настройки', lambda: print('нажата кнопка Настройки'))  # действий пока нет
-    menu.append_option('Язык', open_languege_scene)  # действий пока нет
-    menu.append_option('Выйти', lambda: 'Exit')  # выполняет выход из игры
+    menu.append_option('Play', lambda: print('нажата кнопка Играть'))  # действий пока нет
+    menu.append_option('Settings', lambda: print('нажата кнопка Настройки'))  # действий пока нет
+    menu.append_option('Language', open_language_scene)  # открывает окно выбора языка
+    menu.append_option('Exit', lambda: 'Exit')  # выполняет выход из игры
 
     # загружаем задний фон
     background = tools.load_image('background.png')
@@ -111,7 +119,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         # отрисовываем всё на сцене
         virtual_surface.fill((0, 0, 0))
         virtual_surface.blit(background, (0, 0))
-        menu.draw(virtual_surface, 70, screen)
+        menu.draw(virtual_surface, 70, screen, settings)
         if extra_scene is not None:
             extra_scene.draw(virtual_surface)
         # отрисовываем сцену на экране
