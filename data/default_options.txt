@@ -1,1 +1,6 @@
-language Русский
+Language Русский
+Forward W
+Left A
+Right D
+Backward S
+Jump Space

@@ -1,7 +1,10 @@
 import pygame
 import scripts.tools as tools
 from scripts.scenes.language_menu import LanguageScene
+from scripts.scenes.settings_menu import SettingsScene
+
 from data.language import russian, english
+
 
 pygame.init()
 
@@ -38,9 +41,9 @@ class Menu:  # класс отвечающий за кнопки в меню
         # метод отрисовки всех элементов
         # координаты расположения меню относительно виртуальнйо поверхности
         x, y = surface.get_width() * 0.025, surface.get_height() * 0.555
-        if settings['language'] == 'English':
+        if settings['Language'] == 'English':
             lang = english.eng
-        elif settings['language'] == 'Русский':
+        elif settings['Language'] == 'Русский':
             lang = russian.rus
 
         for i, option in enumerate(self.option_surflaces):  # проходимся по всем повехностям
@@ -81,9 +84,14 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         extra_scene = LanguageScene(*virtual_surface.get_size(), settings)  # создание меню выбора языков
         menu.is_action_menu = False  # блокировка меню
 
+    def open_settings_scene():
+        nonlocal extra_scene, menu, virtual_surface
+        extra_scene = SettingsScene(*virtual_surface.get_size(), settings)
+        menu.is_action_menu = False
+
     # создание кнопок меню
     menu.append_option('Play', lambda: print('нажата кнопка Играть'))  # действий пока нет
-    menu.append_option('Settings', lambda: print('нажата кнопка Настройки'))  # действий пока нет
+    menu.append_option('Settings', open_settings_scene)  # открывает окно изменения настроек
     menu.append_option('Language', open_language_scene)  # открывает окно выбора языка
     menu.append_option('Exit', lambda: 'Exit')  # выполняет выход из игры
 
