@@ -1,5 +1,5 @@
 Language Русский
-Forward W
+Upward W
 Left A
 Right D
 Backward S

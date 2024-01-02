@@ -1,4 +1,10 @@
 eng = {'Play': 'Play',
-       'Settings': 'Settings',
+       'Control': 'Control',
        'Language': 'Languege',
-       'Exit': 'Exit'}
+       'Exit': 'Exit',
+       'Upward': 'Up',
+       'Left': 'Left',
+       'Right': 'Right',
+       'Backward': 'Backward',
+       'Jump': 'Jump'
+       }

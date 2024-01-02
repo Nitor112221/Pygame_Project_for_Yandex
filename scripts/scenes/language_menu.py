@@ -25,6 +25,12 @@ class LanguageScene:
         font = pygame.font.SysFont('Comic Sans MS', 36)
         text_color = pygame.Color((0, 0, 0))
 
+        if self.selected_language == 'Русский':
+            text = font.render('Назад: Esc', True, text_color)
+        elif self.selected_language == 'English':
+            text = font.render('Back: Esc', True, text_color)
+        surface.blit(text, (surface.get_width() * 0.2 + 10, surface.get_height() * 0.2 + 10))
+
         for i, language in enumerate(self.languages):
             text = font.render(language, True, text_color)
             text_rect = text.get_rect(center=(surface.get_width() * 0.5,

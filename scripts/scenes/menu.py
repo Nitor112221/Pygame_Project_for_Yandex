@@ -1,7 +1,7 @@
 import pygame
 import scripts.tools as tools
 from scripts.scenes.language_menu import LanguageScene
-from scripts.scenes.settings_menu import SettingsScene
+from scripts.scenes.control_menu import ControlScene
 
 from data.language import russian, english
 
@@ -86,12 +86,12 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
 
     def open_settings_scene():
         nonlocal extra_scene, menu, virtual_surface
-        extra_scene = SettingsScene(*virtual_surface.get_size(), settings)
+        extra_scene = ControlScene(*virtual_surface.get_size(), settings)
         menu.is_action_menu = False
 
     # создание кнопок меню
     menu.append_option('Play', lambda: print('нажата кнопка Играть'))  # действий пока нет
-    menu.append_option('Settings', open_settings_scene)  # открывает окно изменения настроек
+    menu.append_option('Control', open_settings_scene)  # открывает окно изменения настроек
     menu.append_option('Language', open_language_scene)  # открывает окно выбора языка
     menu.append_option('Exit', lambda: 'Exit')  # выполняет выход из игры
 
