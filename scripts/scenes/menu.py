@@ -2,6 +2,7 @@ import pygame
 import scripts.tools as tools
 from scripts.scenes.language_menu import LanguageScene
 from scripts.scenes.control_menu import ControlScene
+from scripts.scenes.game_scene import game_scene
 
 from data.language import russian, english
 
@@ -78,6 +79,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     # меню игры
     extra_scene = None  # переменная хранящая текущую доп сцену (с выбором языка или настроек)
     menu = Menu()  # создание меню
+    running = True
 
     def open_language_scene():  # функция открывающая окно выбора языка и блокирующая меню
         nonlocal extra_scene, menu, virtual_surface
@@ -89,8 +91,13 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         extra_scene = ControlScene(*virtual_surface.get_size(), settings)
         menu.is_action_menu = False
 
+    def open_game_scene():
+        nonlocal running
+        running = False
+        switch_scene(game_scene)
+
     # создание кнопок меню
-    menu.append_option('Play', lambda: print('нажата кнопка Играть'))  # действий пока нет
+    menu.append_option('Play', open_game_scene)  # запускает игру
     menu.append_option('Control', open_settings_scene)  # открывает окно изменения настроек
     menu.append_option('Language', open_language_scene)  # открывает окно выбора языка
     menu.append_option('Exit', lambda: 'Exit')  # выполняет выход из игры
@@ -99,7 +106,6 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     background = tools.load_image('background.png')
     background = pygame.transform.scale(background, virtual_surface.get_size())
 
-    running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
