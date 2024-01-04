@@ -16,11 +16,11 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
 
-    level_x, level_y = tools.generate_level(tools.load_level('level_1'), (all_sprites, tiles_group))
-    player = tools.Player(24, 12, all_sprites, player_group)
+    level_x, level_y, orientation_tile = tools.generate_level(tools.load_level('level_1'), (all_sprites, tiles_group))
+    player = tools.Player(0, 0, all_sprites, player_group)
     player_speed_x = 0
     player_speed_y = 0
-    camera = Camera((384, 192))
+    camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
 
     running = True
     while running:
@@ -56,7 +56,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             camera.apply(sprite)
 
         tiles_group.draw(virtual_surface)
-
+        player_group.draw(virtual_surface)
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
         pygame.display.flip()

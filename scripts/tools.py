@@ -43,9 +43,14 @@ def tile_init():
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y, *groups):
         super().__init__(*groups)
-        self.image = tile_images[tile_type]
-        self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
+        if tile_type is not None:
+            self.image = tile_images[tile_type]
+            self.rect = self.image.get_rect().move(
+                tile_width * pos_x, tile_height * pos_y)
+        else:
+            self.image = tile_images['platform']
+            self.rect = pygame.Rect(0, 0, 0, 0).move(
+                tile_width * pos_x, tile_height * pos_y)
 
 
 default_options_file = 'data/default_options.txt'
@@ -112,12 +117,15 @@ def generate_level(level, group):
                 Tile('platform_horizontal', x, y, *group)
             elif level[y][x] == '3':
                 Tile('platform_vertical', x, y, *group)
-    # вернем игрока, а также размер поля в клетках
-    return x, y
+    tile = Tile(None, 0, 0, *group)
+    # оринтеровочный tile, нужен для правильной отрисовки камеры
+    # вернем размеры поля и оринтеровочный Tile
+    return x, y, tile
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, *group):
         super().__init__(*group)
-        self.rect = pygame.Rect(0, 0, 50, 50) .move(
-            tile_width * pos_x + 15, tile_height * pos_y + 5)
+        self.image = load_image('player/player.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
