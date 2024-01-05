@@ -56,13 +56,17 @@ class LanguageScene:
                 if self.is_inside_menu(mouse_pos, surface):
                     index = (mouse_pos[1] - round(surface.get_height() * 0.275)) // 50
                     if 0 <= index < len(self.languages):
+                        # если мышка указывает на существующий язык и произошёл клик, то выбранный язык меняется на
+                        # указанный
                         self.selected_language = self.languages[index]
                         self.settings['Language'] = self.selected_language
-                        print(f"Selected Language: {self.selected_language}")
         elif event.type == pygame.KEYDOWN:
+            # если была нажата кнопка Esc, то доп окно должно закрытся, а язык сохранится в файле
             if event.key == pygame.K_ESCAPE:
                 tools.save_user_options(self.settings)
                 return 'Close'
+
+            # управление выбором языков с помощью стрелочек
             elif event.key == pygame.K_UP:
                 ind = (self.languages.index(self.selected_language) - 1) % len(self.languages)
                 self.selected_language = self.languages[
@@ -79,11 +83,13 @@ class LanguageScene:
                 print(f"Selected Language: {self.selected_language}")
 
     def is_inside_menu(self, mouse_pos, surface: pygame.Surface) -> bool:
+        # метод проверки на то, что мышка находится в пределах доп экрана
         menu_rect = pygame.Rect(surface.get_width() * 0.2, surface.get_height() * 0.2, self.width, self.height)
         return menu_rect.collidepoint(mouse_pos)
 
     @staticmethod
     def hover(mos_pos: tuple[int, int], screen: pygame.Surface, virtual_surface: pygame.Surface) -> tuple[int, int]:
+        # метод, который преобразует координаты мыши на экране в координаты мыши относительно виртуальной поверхности
         x_coeff = virtual_surface.get_width() / screen.get_width()
         y_coeff = virtual_surface.get_height() / screen.get_height()
         return int(mos_pos[0] * x_coeff), int(mos_pos[1] * y_coeff)

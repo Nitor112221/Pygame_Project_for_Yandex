@@ -77,7 +77,7 @@ class Menu:  # класс отвечающий за кнопки в меню
 
 def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
     # меню игры
-    extra_scene = None  # переменная хранящая текущую доп сцену (с выбором языка или настроек)
+    extra_scene = None  # переменная хранящая текущую доп сцену (с выбором языка или гайдом по управлению)
     menu = Menu()  # создание меню
     running = True
 
@@ -86,12 +86,12 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         extra_scene = LanguageScene(*virtual_surface.get_size(), settings)  # создание меню выбора языков
         menu.is_action_menu = False  # блокировка меню
 
-    def open_control_scene() -> None:
+    def open_control_scene() -> None:  # функция открывающая окно гайда по игре и блокирующая меню
         nonlocal extra_scene, menu, virtual_surface
         extra_scene = ControlScene(*virtual_surface.get_size(), settings)
         menu.is_action_menu = False
 
-    def open_game_scene() -> None:
+    def open_game_scene() -> None:  # функция запуска основной игры
         nonlocal running
         running = False
         switch_scene(game_scene)
@@ -124,18 +124,22 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                         switch_scene(None)
             if event.type == pygame.MOUSEBUTTONDOWN:  # обработка нажатий мыши
                 if menu.check_mouse_event(50, 600, 70, screen, virtual_surface) == 'Exit':
+                    # если метод вернул Exit - закрываем игру
                     running = False
                     switch_scene(None)
             if extra_scene is not None:
                 if extra_scene.handle_event(event, virtual_surface, screen) == 'Close':
+                    # если метод вернул Close - закрываем доп окно и востанавливаем функционал меню
                     extra_scene = None
                     menu.is_action_menu = True
+
         # отрисовываем всё на сцене
         virtual_surface.fill((0, 0, 0))
         virtual_surface.blit(background, (0, 0))
         menu.draw(virtual_surface, 70, screen, settings)
         if extra_scene is not None:
             extra_scene.draw(virtual_surface)
+
         # отрисовываем сцену на экране
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
