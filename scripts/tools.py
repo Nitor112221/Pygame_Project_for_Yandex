@@ -130,15 +130,7 @@ def generate_level(level, group):
                 Tile('platform_horizontal', x, y, *group)
             elif level[y][x] == '3':
                 Tile('platform_vertical', x, y, *group)
-    tile = Tile(None, 0, 0, *group)  # создание ориентировочного спрайта
+    tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры
     # вернем размеры поля и оринтеровочный Tile
     return x, y, tile
-
-
-class Player(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, *group):
-        super().__init__(*group)
-        self.image = load_image('player/player.png')
-        self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
