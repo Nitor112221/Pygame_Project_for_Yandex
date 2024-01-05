@@ -10,7 +10,7 @@ class Entity(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(pos_x * 8, pos_y * 8)
         self.x_speed = 0
         self.y_speed = 0
-        self.jump_speed = -12
+        self.jump_speed = -4
         # Мертв ли игрок или нет
         self.is_dead = False
         # Стоит ли игрок на земле или нет
