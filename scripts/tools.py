@@ -69,6 +69,12 @@ class Tile(pygame.sprite.Sprite):
             if 'disappearing_block' in tile_type:
                 self.disappearing_time = None
                 self.original_image = tile_images[tile_type].copy()  # Исходное изображение блока
+                if '1' in tile_type:
+                    self.dotted_line = load_image('disappearing_block/dotted_line_1.png')
+                elif '2' in tile_type:
+                    self.dotted_line = load_image('disappearing_block/dotted_line_2.png')
+                elif '3' in tile_type:
+                    self.dotted_line = load_image('disappearing_block/dotted_line_3.png')
         else:
             self.image = tile_images['platform'].copy()
             self.rect = pygame.Rect(0, 0, 0, 0).move(
@@ -77,16 +83,13 @@ class Tile(pygame.sprite.Sprite):
     def update(self, player):
         if 'disappearing_block' in self.tile_type:
             if player.rect.move(0, 2).colliderect(self.rect) and not self.disappearing_time:
-                self.disappearing_time = time.time() + 1
+                self.disappearing_time = time.time() + 1.5
             if self.disappearing_time is not None and time.time() >= self.disappearing_time:
-                # Изменяем изображение на белую обводку
-                self.image.fill((0, 0, 0))
-                self.image.fill((255, 255, 255, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                pygame.draw.rect(self.image, (255, 255, 255), self.image.get_rect(), 1)
+                self.image = self.dotted_line.copy()
                 self.is_touchable = False
                 if player.rect.move(0, 2).colliderect(self.rect):
                     player.is_grounded = False
-            if self.disappearing_time is not None and time.time() >= self.disappearing_time + 5:
+            if self.disappearing_time is not None and time.time() >= self.disappearing_time + 3:
                 # Восстанавливаем изображение блока
                 self.image = self.original_image.copy()
                 self.is_touchable = True
