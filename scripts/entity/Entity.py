@@ -78,8 +78,6 @@ class Entity(pygame.sprite.Sprite):
         if self.status is None:
             self.status = 'classic_' + self.direction
 
-        print(self.status)
-
     def animate(self):
         animation = self.animation[self.status]
 

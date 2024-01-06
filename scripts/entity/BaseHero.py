@@ -40,6 +40,8 @@ class BaseHero(Entity):
                 self.x_speed += -3
             if event.key == pygame.K_RIGHT:
                 self.x_speed += 3
+            if event.key == pygame.K_DOWN:
+                self.y_speed += 1
         elif event.type == pygame.KEYUP:  # заканчиваем движение
             if event.key == pygame.K_SPACE:
                 self.y_speed = max(-2, self.y_speed)
@@ -47,6 +49,8 @@ class BaseHero(Entity):
                 self.x_speed += 3
             if event.key == pygame.K_RIGHT:
                 self.x_speed -= 3
+            if event.key == pygame.K_DOWN:
+                self.y_speed -= 1
 
     def jump(self):
         if self.is_grounded:
