@@ -41,9 +41,10 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         for sprite in all_sprites:
             camera.apply(sprite)
 
+        tiles_group.update(player)
+        player_group.update(tiles_group)
         # отображаем все тайлы и игрока
         tiles_group.draw(virtual_surface)
-        player_group.update(tiles_group)
         player_group.draw(virtual_surface)
 
         # трансформируем виртуальную поверхность и растягиваем её на весь экран

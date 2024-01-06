@@ -1,6 +1,7 @@
 import pygame
 import os
 import sys
+import time
 
 pygame.init()
 
@@ -29,7 +30,7 @@ def load_image(name: str, colorkey=None, reverse=False) -> pygame.Surface:  # ф
         if colorkey == -1:  # цвет для прозрачности левого верхнего угла
             colorkey = image.get_at((0, 0))
         elif colorkey == -2:  # цвет для прозрачности левого нижнего угла
-            colorkey = image.get_at((0, image.get_height()))
+            colorkey = image.get_at((0, image.get_height() - 1))
         image.set_colorkey(colorkey)
     else:
         image = image.convert_alpha()
@@ -46,7 +47,10 @@ def tile_init():
     tile_images = {
         'platform': load_image('platform/platform.png'),
         'platform_horizontal': load_image('platform/platform_horizontal.png'),
-        'platform_vertical': load_image('platform/platform_vertical.png')
+        'platform_vertical': load_image('platform/platform_vertical.png'),
+        'disappearing_block1': load_image('disappearing_block/disappearing_block_1.png', -2),
+        'disappearing_block2': load_image('disappearing_block/disappearing_block_2.png', -2),
+        'disappearing_block3': load_image('disappearing_block/disappearing_block_3.png', -2)
     }
 
     tile_width = tile_height = 8  # размеры 1 тайла
@@ -56,16 +60,37 @@ def tile_init():
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y, *groups, is_touchable=True):
         self.tile_type = tile_type
-        self.is_touchable = is_touchable  # нужен, чтобы делать неосязаемые проходимые блоки
+        self.is_touchable = is_touchable
         super().__init__(*groups)
-        if tile_type is not None:  # если тип выбран, то тайло обычный
-            self.image = tile_images[tile_type]
+        if tile_type is not None:
+            self.image = tile_images[tile_type].copy()
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
-        else:  # иначе тайл ориентировочный и его координаты 0, 0 + он невидемый
-            self.image = tile_images['platform']
+            if 'disappearing_block' in tile_type:
+                self.disappearing_time = None
+                self.original_image = tile_images[tile_type].copy()  # Исходное изображение блока
+        else:
+            self.image = tile_images['platform'].copy()
             self.rect = pygame.Rect(0, 0, 0, 0).move(
                 tile_width * pos_x, tile_height * pos_y)
+
+    def update(self, player):
+        if 'disappearing_block' in self.tile_type:
+            if player.rect.move(0, 2).colliderect(self.rect) and not self.disappearing_time:
+                self.disappearing_time = time.time() + 1
+            if self.disappearing_time is not None and time.time() >= self.disappearing_time:
+                # Изменяем изображение на белую обводку
+                self.image.fill((0, 0, 0))
+                self.image.fill((255, 255, 255, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                pygame.draw.rect(self.image, (255, 255, 255), self.image.get_rect(), 1)
+                self.is_touchable = False
+                if player.rect.move(0, 2).colliderect(self.rect):
+                    player.is_grounded = False
+            if self.disappearing_time is not None and time.time() >= self.disappearing_time + 5:
+                # Восстанавливаем изображение блока
+                self.image = self.original_image.copy()
+                self.is_touchable = True
+                self.disappearing_time = None
 
 
 default_options_file = 'data/default_options.txt'  # путь к настройкам по умолчанию
@@ -140,6 +165,12 @@ def generate_level(level, group):
                 Tile('platform_horizontal', x, y, *group, is_touchable=False)
             elif level[y][x] == '6':
                 Tile('platform_vertical', x, y, *group, is_touchable=False)
+            elif level[y][x] == '7':
+                Tile('disappearing_block1', x, y, *group)
+            elif level[y][x] == '8':
+                Tile('disappearing_block2', x, y, *group)
+            elif level[y][x] == '9':
+                Tile('disappearing_block3', x, y, *group)
     tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры
     # вернем размеры поля и оринтеровочный Tile
