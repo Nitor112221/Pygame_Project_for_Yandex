@@ -5,14 +5,14 @@ import scripts.tools as tools
 
 class BaseHero(Entity):
     def __init__(self, pos_x, pos_y, *group):
-        animation = {'walk_left': [tools.load_image('player/KnightWalk1.png', reverse=True),
-                                   tools.load_image('player/KnightIdle1.png', reverse=True),
+        animation = {'walk_left': [tools.load_image('player/KnightWalk2.png', reverse=True),
                                    tools.load_image('player/KnightIdle2.png', reverse=True),
-                                   tools.load_image('player/KnightWalk2.png', reverse=True)],
-                     'walk_right': [tools.load_image('player/KnightWalk1.png'),
-                                    tools.load_image('player/KnightIdle1.png'),
+                                   tools.load_image('player/KnightIdle1.png', reverse=True),
+                                   tools.load_image('player/KnightWalk1.png', reverse=True)],
+                     'walk_right': [tools.load_image('player/KnightWalk2.png'),
                                     tools.load_image('player/KnightIdle2.png'),
-                                    tools.load_image('player/KnightWalk2.png')],
+                                    tools.load_image('player/KnightIdle1.png'),
+                                    tools.load_image('player/KnightWalk1.png')],
                      'jump_left': [tools.load_image('player/KnightJump.png', reverse=True)],
                      'jump_right': [tools.load_image('player/KnightJump.png')],
                      'fall_left': [tools.load_image('player/KnightFall.png', reverse=True)],
@@ -37,18 +37,18 @@ class BaseHero(Entity):
             if event.key == pygame.K_SPACE:
                 self.jump()
             if event.key == pygame.K_LEFT:
-                self.x_speed += -3
+                self.x_speed += -2
             if event.key == pygame.K_RIGHT:
-                self.x_speed += 3
+                self.x_speed += 2
             if event.key == pygame.K_DOWN:
                 self.y_speed += 1
         elif event.type == pygame.KEYUP:  # заканчиваем движение
             if event.key == pygame.K_SPACE:
                 self.y_speed = max(-2, self.y_speed)
             if event.key == pygame.K_LEFT:
-                self.x_speed += 3
+                self.x_speed += 2
             if event.key == pygame.K_RIGHT:
-                self.x_speed -= 3
+                self.x_speed -= 2
             if event.key == pygame.K_DOWN:
                 self.y_speed -= 1
 

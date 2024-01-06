@@ -25,7 +25,7 @@ class Entity(pygame.sprite.Sprite):
         # направление в которое смотрит существо (left или right)
         self.direction = 'right'
         self.frame_index = 0
-        self.animation_speed = 0.10
+        self.animation_speed = 0.15
 
     def update(self, tile_group):
         self.y_speed += self.gravity
