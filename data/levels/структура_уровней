@@ -1,8 +1,11 @@
 . - пустое место
-1 - platform/platform.png
-2 - platform/platform_horizontal.png
-3 - platform/platform_vertical.png
-4 - disappearing_block/disappearing_block_1.png
-5 - disappearing_block/disappearing_block_2.png
-6 - disappearing_block/disappearing_block_3.png
+1 - platform/platform.png осязаемый
+2 - platform/platform_horizontal.png осязаемый
+3 - platform/platform_vertical.png осязаемый
+4 - platform/platform.png не осязаемый
+5 - platform/platform_horizontal.png не осязаемый
+6 - platform/platform_vertical.png не осязаемый
+7 - disappearing_block/disappearing_block_1.png осязаемый
+8 - disappearing_block/disappearing_block_2.png осязаемый
+9 - disappearing_block/disappearing_block_3.png осязаемый
 7 - spike/spike_classic.png

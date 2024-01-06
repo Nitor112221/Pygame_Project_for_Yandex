@@ -123,7 +123,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                         running = False
                         switch_scene(None)
             if event.type == pygame.MOUSEBUTTONDOWN:  # обработка нажатий мыши
-                if menu.check_mouse_event(50, 600, 70, screen, virtual_surface) == 'Exit':
+                if menu.check_mouse_event(50, 600, 100, screen, virtual_surface) == 'Exit':
                     # если метод вернул Exit - закрываем игру
                     running = False
                     switch_scene(None)
@@ -136,7 +136,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         # отрисовываем всё на сцене
         virtual_surface.fill((0, 0, 0))
         virtual_surface.blit(background, (0, 0))
-        menu.draw(virtual_surface, 70, screen, settings)
+        menu.draw(virtual_surface, 100, screen, settings)
         if extra_scene is not None:
             extra_scene.draw(virtual_surface)
 
