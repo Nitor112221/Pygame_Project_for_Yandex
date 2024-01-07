@@ -17,7 +17,7 @@ tools.save_user_options(settings)
 screen = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 
 # экран на котором всё будет рисоватся, а потом оно растянется
-virtual_surface = pygame.Surface((1920, 1080))
+virtual_surface = pygame.Surface((1920, 1080), pygame.SRCALPHA)
 
 # переменная в которой будет храниться текущая сцена
 current_scene = None

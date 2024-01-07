@@ -3,15 +3,48 @@ import scripts.tools as tools
 from data.language import russian, english
 
 
+class Tag(pygame.sprite.Sprite):
+    def __init__(self, pos_x: int, pos_y: int, *group, is_available=False):
+        super().__init__(*group)
+        self.image = tools.load_image('WorldMap/tag.png')
+        self.rect = self.image.get_rect().move(pos_x, pos_y)
+        self.is_available = is_available
+        self.scroll_y = 0
+
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect.move(0, -self.scroll_y))
+
+    def update(self, mouse_pos: tuple[int, int], screen: pygame.Surface, virtual_surface: pygame.Surface, zoom,
+               scroll_x, scroll_y):
+        if pygame.Rect(self.rect.x - scroll_x, self.rect.y - scroll_y, self.rect.w * zoom,
+                       self.rect.h * zoom).collidepoint(tools.hover(mouse_pos, screen, virtual_surface)):
+            self.scroll_y = 20
+            print('YES')
+        else:
+            self.scroll_y = 0
+
+
 def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
     world_map = tools.load_image('WorldMap/map_world_with_path.png')
+
+    all_sprite = pygame.sprite.Group()
+    tag_group = pygame.sprite.Group()
+
+    with open('data/Saves/tag_coords', 'r') as file:
+        for coords in file.readline().split(','):
+            coords = coords.replace('(', '').replace(')', '')
+            coords = coords.split(';')
+            Tag(int(coords[0]), int(coords[1]), all_sprite, tag_group)
+
+    fps = 60
+    clock = pygame.time.Clock()
 
     scroll_x = 0
     scroll_y = 0
     scroll_x_speed = 0
     scroll_y_speed = 0
 
-    zoom = 1.5  # увеличение будет от 2 до 5
+    zoom = 2  # увеличение будет от 2 до 3.5
 
     background = tools.load_image('background.png')
     background = pygame.transform.scale(background, virtual_surface.get_size())
@@ -20,12 +53,13 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
     start_pos = (0, 0)
     running = True
     while running:
+        world_map_art = world_map.copy()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
             elif event.type == pygame.MOUSEWHEEL:
-                zoom += event.y * 0.5
+                zoom += event.y * 0.2
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
                 start_pos = pygame.mouse.get_pos()
@@ -52,6 +86,9 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
                     scroll_y_speed -= 10
                 if event.key == pygame.K_UP:
                     scroll_y_speed += 10
+
+        virtual_surface.fill((0, 0, 0))
+
         scroll_x += scroll_x_speed * zoom
         scroll_y += scroll_y_speed * zoom
         if dragging:
@@ -68,16 +105,18 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
         scroll_x = max(-max_scroll_x, min(max_scroll_x, scroll_x))
         scroll_y = max(-max_scroll_y, min(max_scroll_y, scroll_y))
 
-        virtual_surface.fill((0, 0, 0))
-
         zoom = max(2, min(zoom, 3.5))
+
+        tag_group.update(pygame.mouse.get_pos(), screen, virtual_surface, zoom, scroll_x, scroll_y)
+        for sprite in tag_group:
+            sprite.draw(world_map_art)
 
         # Рассчитываем новый размер карты с учетом масштаба
         scaled_width = int(world_map.get_width() * zoom)
         scaled_height = int(world_map.get_height() * zoom)
 
         # Масштабируем карту
-        scaled_map = pygame.transform.scale(world_map, (scaled_width, scaled_height))
+        scaled_map = pygame.transform.scale(world_map_art, (scaled_width, scaled_height))
 
         virtual_surface.blit(background, (0, 0))
         virtual_surface.blit(scaled_map,
@@ -87,3 +126,4 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
         pygame.display.flip()
+        clock.tick(fps)

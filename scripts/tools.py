@@ -22,7 +22,7 @@ def load_image(name: str, colorkey=None, reverse=False) -> pygame.Surface:  # ф
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
     # Загрузка изображения
-    image = pygame.image.load(fullname)
+    image = pygame.image.load(fullname).convert_alpha()
 
     # Применение цветового ключа для прозрачности, если указано
     if colorkey is not None:
@@ -178,3 +178,9 @@ def generate_level(level, group):
     # оринтеровочный tile, нужен для правильной отрисовки камеры
     # вернем размеры поля и оринтеровочный Tile
     return x, y, tile
+
+
+def hover(mos_pos: tuple[int, int], screen: pygame.Surface, virtual_surface: pygame.Surface) -> tuple[int, int]:
+    x_coeff = virtual_surface.get_width() / screen.get_width()
+    y_coeff = virtual_surface.get_height() / screen.get_height()
+    return int(mos_pos[0] * x_coeff), int(mos_pos[1] * y_coeff)
