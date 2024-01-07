@@ -3,9 +3,9 @@ import scripts.tools as tools
 from scripts.scenes.language_menu import LanguageScene
 from scripts.scenes.control_menu import ControlScene
 from scripts.scenes.game_scene import game_scene
+from scripts.scenes.WorldMap_scene import world_map_scene
 
 from data.language import russian, english
-
 
 pygame.init()
 
@@ -64,15 +64,22 @@ class Menu:  # класс отвечающий за кнопки в меню
             surface.blit(option, option_rect)  # отрисовываем текст
         surface.blit(underline, underline_pos)  # отрисовываем подчёркивание
 
-    def check_mouse_event(self, x, y, option_y_padding, screen, surf):
+    def check_mouse_event(self, option_y_padding, screen, surf, settings: dict):
         # метод находящий элемент на который указывает мышь
-        if self.is_action_menu:
-            for i, option in enumerate(self.option_surflaces):
-                option = font.render(option, True, pygame.Color((255, 255, 255)))
-                option_rect = option.get_rect()
-                option_rect.topleft = (x, y + i * option_y_padding)
+        x, y = surf.get_width() * 0.025, surf.get_height() * 0.555
+        if settings['Language'] == 'English':
+            lang = english.eng
+        elif settings['Language'] == 'Русский':
+            lang = russian.rus
+
+        for i, option in enumerate(self.option_surflaces):  # проходимся по всем повехностям
+            # создаём прямоугольник описывающий текст2
+            option = font.render(lang[option], True, pygame.Color((255, 255, 255)))
+            option_rect = option.get_rect()
+            option_rect.topleft = (x, y + i * option_y_padding)
+            if self.is_action_menu:
                 if option_rect.collidepoint(self.hover(pygame.mouse.get_pos(), screen, surf)):
-                    return self.select()
+                    return self.option_callback[i]()
 
 
 def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
@@ -94,7 +101,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     def open_game_scene() -> None:  # функция запуска основной игры
         nonlocal running
         running = False
-        switch_scene(game_scene)
+        switch_scene(world_map_scene)
 
     # создание кнопок меню
     menu.append_option('Play', open_game_scene)  # запускает игру
@@ -123,7 +130,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                         running = False
                         switch_scene(None)
             if event.type == pygame.MOUSEBUTTONDOWN:  # обработка нажатий мыши
-                if menu.check_mouse_event(50, 600, 100, screen, virtual_surface) == 'Exit':
+                if menu.check_mouse_event(100, screen, virtual_surface, settings) == 'Exit':
                     # если метод вернул Exit - закрываем игру
                     running = False
                     switch_scene(None)
