@@ -7,6 +7,7 @@ import scripts.tools as tools
 pygame.init()
 
 
+
 default_options = tools.load_default_options()
 settings = tools.load_user_options()
 # Теперь user_options содержит значения из options.txt, и отсутствующие настройки добавлены из default_options
@@ -20,6 +21,7 @@ info = pygame.display.Info()
 screen_width = pygame.display.Info().current_w
 screen_height = pygame.display.Info().current_h
 screen = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
+
 
 # экран на котором всё будет рисоватся, а потом оно растянется
 virtual_surface = pygame.Surface((screen_width, screen_height))

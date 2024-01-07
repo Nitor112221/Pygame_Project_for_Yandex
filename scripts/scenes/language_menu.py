@@ -14,8 +14,7 @@ class LanguageScene:
 
     def draw(self, surface: pygame.Surface):  # Метод отрисовки меню выбора языков
         scene_surface = pygame.Surface((self.width, self.height))
-        scene_surface.fill(pygame.Color('White'))
-        scene_surface.set_alpha(50)
+        scene_surface.fill(pygame.Color('red'))
         surface.blit(scene_surface, (surface.get_width() * 0.2, surface.get_height() * 0.2))
 
         pygame.draw.rect(surface, (255, 255, 255),  # Рамка вокруг меню
