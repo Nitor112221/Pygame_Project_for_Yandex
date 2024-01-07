@@ -8,6 +8,7 @@ pygame.init()
 
 list_coor_board, list_rect_board = [], []
 on_board_sprites = pygame.sprite.Group()
+circuit_sprites = pygame.sprite.Group()
 
 
 class Board:
@@ -68,11 +69,12 @@ class Blocks:
 
 list_coor_b, list_rect_b = [], []
 list_sprites = []
+block_object = None
 
 
 class Editor:
     def __init__(self, surface):
-        global list_coor_b, list_rect_b, list_sprites
+        global list_coor_b, list_rect_b, list_sprites, block_object
         surface_w = surface.get_width()
         surface_h = surface.get_height()
 
@@ -160,17 +162,31 @@ class EditorScene:
         elif event.type == pygame.MOUSEWHEEL:
             self.current_shift += event.y * 15
 
-    def circuit(self, surface):
-        global block_selected, index_selected_sprite
+    def draw_element(self, surface):
+        global block_selected, index_selected_sprite, circuit_sprites
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not block_selected:
                     counter = 0
                     for rect in list_rect_b:
                         if rect.collidepoint(event.pos):
-                            print(counter)
                             index_selected_sprite = counter
                             block_selected = True
+
+                            circuit_sprites = pygame.sprite.Group()
+                            circuit = pygame.sprite.Sprite()
+                            surface = pygame.Surface((rect.width // 4, rect.height // 4),
+                                                           pygame.SRCALPHA)
+                            surface.set_alpha(0)
+                            circuit.image = surface
+                            pygame.draw.rect(circuit.image, (0, 255, 0),
+                                               (0, 0, rect.width // 4, rect.height // 4))
+                            circuit.rect = circuit.image.get_rect()
+                            circuit_sprites.add(circuit)
+                            circuit.rect.x, circuit.rect.y = rect.x, rect.y
+
+
+
                             break
                         counter += 1
                     counter = 0
@@ -179,7 +195,6 @@ class EditorScene:
                     for elem in list_rect_board:
                         if elem.collidepoint(event.pos):
                             arrow = pygame.sprite.Sprite()
-                            print(index_selected_sprite)
                             image = list_sprites[index_selected_sprite]
                             scaled_image = pygame.transform.scale(image, (elem.width, elem.height))
                             arrow.image = scaled_image
@@ -193,3 +208,4 @@ class EditorScene:
                                     block_selected = False
 
         on_board_sprites.draw(surface)
+        circuit_sprites.draw(surface)

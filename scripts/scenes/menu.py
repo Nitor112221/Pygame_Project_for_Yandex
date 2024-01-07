@@ -149,7 +149,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         menu.draw(virtual_surface, 70, screen, settings)
         if extra_scene is not None:
             extra_scene.draw(virtual_surface)
-            extra_scene.circuit(virtual_surface)
+            extra_scene.draw_element(virtual_surface)
         # отрисовываем сцену на экране
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
