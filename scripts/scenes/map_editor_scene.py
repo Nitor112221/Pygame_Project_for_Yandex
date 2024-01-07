@@ -6,6 +6,9 @@ from data.language import russian, english
 pygame.init()
 
 
+list_coor_board, list_rect_board = [], []
+
+
 class Board:
     def __init__(self, width, hight, cell_size, top_shift, left_shift):
         self.width = width
@@ -22,10 +25,17 @@ class Board:
         self.size = size
 
     def render(self, screen):
+        global list_coor_board, list_rect_board
+        list_coor_board, list_rect_board = [], []
         for row in range(self.width):
             for col in range(self.hight):
-                pygame.draw.rect(screen, (80, 80, 80), (row * self.size + self.left, col * self.size + self.top,
-                                                   self.size, self.size), 1)
+                coor_x = row * self.size + self.left
+                coor_y = col * self.size + self.top
+                rect_board = pygame.Rect((coor_x, coor_y,
+                                                   self.size, self.size))
+                list_rect_board.append(rect_board)
+                list_coor_board.append((coor_x, coor_y))
+                pygame.draw.rect(screen, (80, 80, 80), rect_board, 1)
 
 
 class Blocks:
@@ -56,10 +66,12 @@ class Blocks:
 
 
 list_coor_b, list_rect_b = [], []
+list_sprites = []
+
 
 class Editor:
     def __init__(self, surface):
-        global list_coor_b, list_rect_b
+        global list_coor_b, list_rect_b, list_sprites
         surface_w = surface.get_width()
         surface_h = surface.get_height()
 
@@ -103,7 +115,7 @@ class Editor:
         board.render(surface)
 
 
-chek_button = False
+block_selected = False
 
 
 class EditorScene:
@@ -149,11 +161,30 @@ class EditorScene:
             self.current_shift += event.y * 15
 
     def circuit(self, surface):
+        global block_selected
+        index_selected_sprite = 0
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                counter = 0
-                for rect in list_rect_b:
-                    if rect.collidepoint(event.pos):
-                        print(counter)
-                    counter += 1
-                counter = 0
+                if not block_selected:
+                    counter = 0
+                    for rect in list_rect_b:
+                        if rect.collidepoint(event.pos):
+                            print(counter)
+                            index_selected_sprite = counter
+                        counter += 1
+                    counter = 0
+                    block_selected = True
+
+                elif block_selected:
+                    for elem in list_rect_board:
+                        if elem.collidepoint(event.pos):
+                            sprites = pygame.sprite.Group()
+                            arrow = pygame.sprite.Sprite()
+                            image = list_sprites[index_selected_sprite]
+                            scaled_image = pygame.transform.scale(image, (32, 32))
+                            arrow.image = scaled_image
+                            arrow.rect = arrow.image.get_rect()
+                            sprites.add(arrow)
+                            arrow.rect.x, arrow.rect.y = elem.x, elem.y
+                    sprites.draw(surface)
+                    block_selected = False
