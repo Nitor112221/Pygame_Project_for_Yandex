@@ -9,6 +9,8 @@ pygame.init()
 list_coor_board, list_rect_board = [], []  # Списки координат и прямоугольников ячеек
 on_board_sprites = pygame.sprite.Group()  # Группа спрайтов для ячеек
 circuit_sprites = pygame.sprite.Group()  # Группа спрайтов для выделителей
+map_data = []
+update_map_data = False
 
 list_coor_b, list_rect_b = [], []  # Списки координат и прямоугольников блоков
 list_sprites = []  # Список спрайтов всех блоков
@@ -21,12 +23,15 @@ index_selected_sprite = 0
 class Board:
     # Инициализация основных переменных
     def __init__(self, width, hight, cell_size, top_shift, left_shift):
+        global map_data, update_map_data
         self.width = width
         self.hight = hight
         self.top = top_shift
         self.left = left_shift
         self.size = cell_size
-        self.board = [[0] * width for _ in range(hight)]
+        if not update_map_data:
+            map_data = [['.'] * width for _ in range(hight)]
+            update_map_data = True
 
     # Метод изменения основных переменных
     def set_view(self, width, hight, left, top, cell_size):
@@ -40,6 +45,7 @@ class Board:
     def render(self, screen):
         global list_coor_board, list_rect_board
         list_coor_board, list_rect_board = [], []
+        coor = []
         for row in range(self.width):
             for col in range(self.hight):
                 coor_x = row * self.size + self.left
@@ -49,8 +55,10 @@ class Board:
                                           self.size,
                                           self.size))
                 list_rect_board.append(rect_board)
-                list_coor_board.append((coor_x, coor_y))
+                coor.append((coor_x, coor_y))
                 pygame.draw.rect(screen, (80, 80, 80), rect_board, 1)
+            list_coor_board.append(coor)
+            coor = []
 
 
 # Класс блоков, из которых будет строиться уровень
@@ -130,7 +138,7 @@ class Editor:
         # Определяем параметры для создания доски
         top_shift = 20
         left_shift = 20
-        cell_size = 16
+        cell_size = 48
         rows = surface_w // cell_size - left_shift // cell_size - 1
         cols = surface_h // cell_size - (top_shift + 100) // cell_size - 1
 
@@ -194,6 +202,15 @@ class EditorScene:
     def draw_element(self, surface):
         global block_selected, index_selected_sprite, circuit_sprites
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                key = pygame.key.get_pressed()
+                if key[pygame.K_RETURN]:
+                    file_name = 'level_n'
+                    with open(file_name, 'w', encoding='utf8') as file:
+                        for string in map_data:
+                            string = list(map(lambda x: str(x), string))
+                            file.write(''.join(string) + '\n')
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Если блок еще не был выбран:
                 if not block_selected:
@@ -202,24 +219,27 @@ class EditorScene:
                         if rect.collidepoint(event.pos):
                             # Получаем индекс выбранного блока
                             index_selected_sprite = counter
-                            block_selected = True
 
                             # Отрисовываем выделитель выбранного блока
                             circuit_sprites = pygame.sprite.Group()
                             circuit = pygame.sprite.Sprite()
                             circuit.image = pygame.Surface((rect.width // 4, rect.height // 4))
-                            pygame.draw.rect(circuit.image, (0, 255, 0),
+                            pygame.draw.rect(circuit.image, (0, 190, 0),
                                              (0, 0, rect.width // 4, rect.height // 4))
                             circuit.rect = circuit.image.get_rect()
                             circuit_sprites.add(circuit)
                             circuit.rect.x, circuit.rect.y = rect.x, rect.y
 
+                            # Блок был выбран:
+                            block_selected = True
+
                         counter += 1
 
                 elif block_selected:
+                    pressing = False
                     for elem in list_rect_board:
                         if elem.collidepoint(event.pos):
-
+                            pressing = True
                             # Отрисовываем выбранный блок на доске
                             arrow = pygame.sprite.Sprite()
                             image = list_sprites[index_selected_sprite]
@@ -233,6 +253,13 @@ class EditorScene:
                             for rect in list_rect_b:
                                 if rect.collidepoint(event.pos):
                                     block_selected = False
+
+                    if pressing:
+                        for i in range(len(list_coor_board)):
+                            for j in range(len(list_coor_board[i])):
+                                if list_coor_board[i][j][0] < event.pos[0] < (list_coor_board[i][j][0] + 48) and \
+                                        list_coor_board[i][j][1] < event.pos[1] < (list_coor_board[i][j][1] + 48):
+                                    map_data[j][i] = index_selected_sprite + 1
 
         on_board_sprites.draw(surface)
         circuit_sprites.draw(surface)
