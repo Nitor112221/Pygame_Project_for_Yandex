@@ -7,6 +7,7 @@ pygame.init()
 
 
 list_coor_board, list_rect_board = [], []
+on_board_sprites = pygame.sprite.Group()
 
 
 class Board:
@@ -75,9 +76,7 @@ class Editor:
         surface_w = surface.get_width()
         surface_h = surface.get_height()
 
-        all_sprites = pygame.sprite.Group()
         tiles_group = pygame.sprite.Group()
-        player_group = pygame.sprite.Group()
 
         # Загрузка спрайтов-блоков для создания уровня
         block_1 = tools.load_image('disappearing_block/disappearing_block_1.png')
@@ -106,7 +105,7 @@ class Editor:
         # Определяем размеры клеток и сетки для редактора карт:
         top_shift = 20
         left_shift = 20
-        cell_size = 32
+        cell_size = 16
         rows = surface_w // cell_size - left_shift // cell_size - 1
         cols = surface_h // cell_size - (top_shift + 100) // cell_size - 1
         map_data = [[' ' for _ in range(cols)] for _ in range(rows)]
@@ -116,6 +115,7 @@ class Editor:
 
 
 block_selected = False
+index_selected_sprite = 0
 
 
 class EditorScene:
@@ -161,8 +161,7 @@ class EditorScene:
             self.current_shift += event.y * 15
 
     def circuit(self, surface):
-        global block_selected
-        index_selected_sprite = 0
+        global block_selected, index_selected_sprite
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not block_selected:
@@ -171,20 +170,26 @@ class EditorScene:
                         if rect.collidepoint(event.pos):
                             print(counter)
                             index_selected_sprite = counter
+                            block_selected = True
+                            break
                         counter += 1
                     counter = 0
-                    block_selected = True
 
                 elif block_selected:
                     for elem in list_rect_board:
                         if elem.collidepoint(event.pos):
-                            sprites = pygame.sprite.Group()
                             arrow = pygame.sprite.Sprite()
+                            print(index_selected_sprite)
                             image = list_sprites[index_selected_sprite]
-                            scaled_image = pygame.transform.scale(image, (32, 32))
+                            scaled_image = pygame.transform.scale(image, (elem.width, elem.height))
                             arrow.image = scaled_image
                             arrow.rect = arrow.image.get_rect()
-                            sprites.add(arrow)
+                            on_board_sprites.add(arrow)
                             arrow.rect.x, arrow.rect.y = elem.x, elem.y
-                    sprites.draw(surface)
-                    block_selected = False
+
+                        else:
+                            for rect in list_rect_b:
+                                if rect.collidepoint(event.pos):
+                                    block_selected = False
+
+        on_board_sprites.draw(surface)
