@@ -8,6 +8,8 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
 
     scroll_x = 0
     scroll_y = 0
+    scroll_x_speed = 0
+    scroll_y_speed = 0
 
     zoom = 1.5  # увеличение будет от 2 до 5
 
@@ -33,7 +35,25 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
                 if event.key == pygame.K_ESCAPE:
                     running = False
                     switch_scene('menu_scene')
-
+                if event.key == pygame.K_LEFT:
+                    scroll_x_speed -= 10
+                if event.key == pygame.K_RIGHT:
+                    scroll_x_speed += 10
+                if event.key == pygame.K_DOWN:
+                    scroll_y_speed += 10
+                if event.key == pygame.K_UP:
+                    scroll_y_speed -= 10
+            elif event.type == pygame.KEYUP:  # заканчиваем движение
+                if event.key == pygame.K_LEFT:
+                    scroll_x_speed += 10
+                if event.key == pygame.K_RIGHT:
+                    scroll_x_speed -= 10
+                if event.key == pygame.K_DOWN:
+                    scroll_y_speed -= 10
+                if event.key == pygame.K_UP:
+                    scroll_y_speed += 10
+        scroll_x += scroll_x_speed * zoom
+        scroll_y += scroll_y_speed * zoom
         if dragging:
             # Обновляем смещение при перемещении мышью
             current_pos = pygame.mouse.get_pos()
