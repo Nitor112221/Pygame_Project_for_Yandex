@@ -16,10 +16,14 @@ class Tag(pygame.sprite.Sprite):
 
     def update(self, mouse_pos: tuple[int, int], screen: pygame.Surface, virtual_surface: pygame.Surface, zoom,
                scroll_x, scroll_y):
-        if pygame.Rect(self.rect.x - scroll_x, self.rect.y - scroll_y, self.rect.w * zoom,
-                       self.rect.h * zoom).collidepoint(tools.hover(mouse_pos, screen, virtual_surface)):
+        rect_scaled = pygame.Rect(
+            (self.rect.x - scroll_x // zoom - virtual_surface.get_width() // 12) * zoom,
+            (self.rect.y - scroll_y // zoom - virtual_surface.get_height() // 2.91) * zoom,
+            self.rect.w * zoom,
+            self.rect.h * zoom)
+
+        if rect_scaled.collidepoint(tools.hover(mouse_pos, screen, virtual_surface)):
             self.scroll_y = 20
-            print('YES')
         else:
             self.scroll_y = 0
 
@@ -44,7 +48,7 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
     scroll_x_speed = 0
     scroll_y_speed = 0
 
-    zoom = 2  # увеличение будет от 2 до 3.5
+    zoom = 2
 
     background = tools.load_image('background.png')
     background = pygame.transform.scale(background, virtual_surface.get_size())
@@ -58,8 +62,6 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
             if event.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
-            elif event.type == pygame.MOUSEWHEEL:
-                zoom += event.y * 0.2
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
                 start_pos = pygame.mouse.get_pos()
@@ -104,8 +106,6 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
 
         scroll_x = max(-max_scroll_x, min(max_scroll_x, scroll_x))
         scroll_y = max(-max_scroll_y, min(max_scroll_y, scroll_y))
-
-        zoom = max(2, min(zoom, 3.5))
 
         tag_group.update(pygame.mouse.get_pos(), screen, virtual_surface, zoom, scroll_x, scroll_y)
         for sprite in tag_group:
