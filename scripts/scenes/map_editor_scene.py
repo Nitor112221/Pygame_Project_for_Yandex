@@ -4,17 +4,29 @@ from data.language import russian, english
 
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, tile_type, pos_x, pos_y, *groups, is_touchable=True):
+    def __init__(self, *groups):
         super().__init__(*groups)
-        self.tile_type = tile_type
-        self.is_touchable = is_touchable
         self.image = tools.load_image('path/to/your/tile/image.png')  # Замените путь на свой
-        self.rect = self.image.get_rect().move(
-            8 * pos_x, 8 * pos_y)
+
+        self.tile_images = {
+            '1': tools.load_image('platform/platform.png'),
+            '2': tools.load_image('platform/platform_horizontal.png'),
+            '3': tools.load_image('platform/platform_vertical.png'),
+            '4': tools.load_image('platform/platform.png'),
+            '5': tools.load_image('platform/platform_horizontal.png'),
+            '6': tools.load_image('platform/platform_vertical.png'),
+            '7': tools.load_image('disappearing_block/disappearing_block_1.png', -2),
+            '8': tools.load_image('disappearing_block/disappearing_block_2.png', -2),
+            '9': tools.load_image('disappearing_block/disappearing_block_3.png', -2)
+        }
+
+    def draw(self, surface):
+        pass
+        # for key, value in self.tile_images.items():
 
     # Добавьте метод для изменения типа тайла
-    def change_tile_type(self, new_tile_type):
-        self.tile_type = new_tile_type
+    def change_tile_type(self):
+        pass
         # Здесь может быть логика изменения изображения в зависимости от нового типа
 
 
@@ -24,7 +36,7 @@ class Board:
         self.width = surface.get_width()
         self.height = surface.get_height()
 
-        self.color = pygame.Color(150, 150, 150, 255)
+        self.color = pygame.Color(70, 70, 70, 255)
         self.top = 10
         self.left = 10
         self.cell_size = 16
@@ -45,24 +57,33 @@ class Board:
         self.coordinate_cell = []
         for col in range(len(self.board)):
             for row in range(len(self.board[col])):
-                pygame.draw.rect(self.surface,
-                                 self.color,
-                                 (row * self.cell_size + self.left,
-                                  col * self.cell_size + self.top,
-                                  self.cell_size,
-                                  self.cell_size), 1)
+                self.draw_rect(self.surface,
+                               self.color,
+                               row * self.cell_size + self.left,
+                               col * self.cell_size + self.top,
+                               self.cell_size,
+                               self.cell_size,
+                               1)
                 coordinate.append((self.left + row * self.cell_size, self.top + col * self.cell_size))
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
-    def chek(self, event):
+    def draw_rect(self, surface, color, coor_x, coor_y, size_x, size_y, gauge):
+        pygame.draw.rect(surface,
+                         color,
+                         (coor_x,
+                          coor_y,
+                          size_x,
+                          size_y), gauge)
+
+    def chek_clicked_on_board(self, coor):
         for i in range(len(self.coordinate_cell)):
             for j in range(len(self.coordinate_cell[i])):
-                if self.coordinate_cell[i][j][0] < event.pos[0] < \
+                if self.coordinate_cell[i][j][0] < coor[0] < \
                         (self.coordinate_cell[i][j][0] + self.cell_size) and \
-                        self.coordinate_cell[i][j][1] < event.pos[1] < \
+                        self.coordinate_cell[i][j][1] < coor[1] < \
                         (self.coordinate_cell[i][j][1] + self.cell_size):
-                    print(f'{(i - 1, j)}')
+                    print(f'{(i, j)}')
 
 
 class EditorScene:
@@ -71,7 +92,7 @@ class EditorScene:
         self.virtual_surface = pygame.Surface((virtual_surface.get_width() * 0.5, virtual_surface.get_height() * 0.5))
         self.switch_scene = switch_scene
         self.settings = settings
-        self.map_screen = pygame.Surface((virtual_surface.get_width() * 0.8, virtual_surface.get_height() * 0.6))
+        # self.map_screen = pygame.Surface((virtual_surface.get_width() * 0.8, virtual_surface.get_height() * 0.6))
 
         self.tile_group = pygame.sprite.Group()
 
@@ -85,16 +106,33 @@ class EditorScene:
         self.dragging = False
         self.start_pos = (0, 0)
 
-        self.current_tile_type = 'path'  # Замените на ваше начальное значение типа тайла
-
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.run()
 
     def run(self):
         running = True
-        board = Board(self.map_screen)
+        board = Board(self.screen)
+        # Tile(self.tile_group)
+        # (mouse_pos[0] + self.scroll_x) / self.zoom,
+        # (mouse_pos[1] + self.scroll_y) / self.zoom,
         while running:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_ESCAPE]:
+                running = False
+                self.switch_scene('menu_scene')
+            if keys[pygame.K_LEFT]:
+                self.scroll_x_speed -= 10
+                board.left -= 10
+            if keys[pygame.K_RIGHT]:
+                self.scroll_x_speed += 10
+                board.left += 10
+            if keys[pygame.K_DOWN]:
+                self.scroll_y_speed += 10
+                board.top += 10
+            if keys[pygame.K_UP]:
+                self.scroll_y_speed -= 10
+                board.top -= 10
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -103,27 +141,20 @@ class EditorScene:
                     self.zoom += event.y * 0.2
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     # self.add_tile()
-                    board.chek(event)
+                    board.chek_clicked_on_board(event.pos)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
                     self.remove_tile()
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 2:
                     self.change_current_tile_type()
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                     self.change_current_tile_type(forward=True)
+                    # Если колесико вверх - увеличиваем размер сторон ячеек доски
+                    board.cell_size += 1
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
                     self.change_current_tile_type(forward=False)
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
-                        self.switch_scene('menu_scene')
-                    if event.key == pygame.K_LEFT:
-                        self.scroll_x_speed -= 10
-                    if event.key == pygame.K_RIGHT:
-                        self.scroll_x_speed += 10
-                    if event.key == pygame.K_DOWN:
-                        self.scroll_y_speed += 10
-                    if event.key == pygame.K_UP:
-                        self.scroll_y_speed -= 10
+                    # Если колесико вниз - увеличиваем размер сторон ячеек доски до миниального размера = 8
+                    if board.cell_size > 8:
+                        board.cell_size -= 1
                 elif event.type == pygame.KEYUP:  # заканчиваем движение
                     if event.key == pygame.K_LEFT:
                         self.scroll_x_speed += 10
@@ -166,8 +197,6 @@ class EditorScene:
 
     def render(self):
         self.virtual_surface.fill((0, 0, 0))
-        self.virtual_surface.blit(self.map_screen,
-                                  (10, 10))
         self.zoom = max(2, min(self.zoom, 3.5))
 
         self.tile_group.draw(self.virtual_surface)
@@ -177,8 +206,6 @@ class EditorScene:
 
     def add_tile(self):
         mouse_pos = pygame.mouse.get_pos()
-        tile = Tile(self.current_tile_type, (mouse_pos[0] + self.scroll_x) / self.zoom,
-                    (mouse_pos[1] + self.scroll_y) / self.zoom, self.tile_group)
 
     def remove_tile(self):
         mouse_pos = pygame.mouse.get_pos()
