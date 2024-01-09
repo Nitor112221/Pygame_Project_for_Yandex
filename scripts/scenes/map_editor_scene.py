@@ -27,8 +27,10 @@ class Board:
         self.color = pygame.Color(150, 150, 150, 255)
         self.top = 10
         self.left = 10
-        self.size = 16
+        self.cell_size = 16
         self.board = [['.'] * 48 for _ in range(24)]
+        self.coordinate_cell = []
+
         filename = ''
         if tools.is_file_exists(filename):
             self.board = tools.load_level(filename)
@@ -36,25 +38,40 @@ class Board:
     def set_view(self, left, top, size):
         self.top = top
         self.left = left
-        self.size = size
+        self.cell_size = size
 
     def draw(self):
+        coordinate = []
+        self.coordinate_cell = []
         for col in range(len(self.board)):
             for row in range(len(self.board[col])):
                 pygame.draw.rect(self.surface,
                                  self.color,
-                                 (row * self.size + self.left,
-                                  col * self.size + self.top,
-                                  self.size,
-                                  self.size), 1)
+                                 (row * self.cell_size + self.left,
+                                  col * self.cell_size + self.top,
+                                  self.cell_size,
+                                  self.cell_size), 1)
+                coordinate.append((self.left + row * self.cell_size, self.top + col * self.cell_size))
+            self.coordinate_cell.append(coordinate)
+            coordinate = []
+
+    def chek(self, event):
+        for i in range(len(self.coordinate_cell)):
+            for j in range(len(self.coordinate_cell[i])):
+                if self.coordinate_cell[i][j][0] < event.pos[0] < \
+                        (self.coordinate_cell[i][j][0] + self.cell_size) and \
+                        self.coordinate_cell[i][j][1] < event.pos[1] < \
+                        (self.coordinate_cell[i][j][1] + self.cell_size):
+                    print(f'{(i - 1, j)}')
 
 
 class EditorScene:
-    def __init__(self, screen, virtual_surface, switch_scene, settings):
+    def __init__(self, screen, virtual_surface: pygame.Surface, switch_scene, settings):
         self.screen = screen
-        self.virtual_surface = virtual_surface
+        self.virtual_surface = pygame.Surface((virtual_surface.get_width() * 0.5, virtual_surface.get_height() * 0.5))
         self.switch_scene = switch_scene
         self.settings = settings
+        self.map_screen = pygame.Surface((virtual_surface.get_width() * 0.8, virtual_surface.get_height() * 0.6))
 
         self.tile_group = pygame.sprite.Group()
 
@@ -76,7 +93,7 @@ class EditorScene:
 
     def run(self):
         running = True
-        board = Board(self.screen)
+        board = Board(self.map_screen)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -85,7 +102,8 @@ class EditorScene:
                 elif event.type == pygame.MOUSEWHEEL:
                     self.zoom += event.y * 0.2
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    self.add_tile()
+                    # self.add_tile()
+                    board.chek(event)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
                     self.remove_tile()
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 2:
@@ -148,7 +166,8 @@ class EditorScene:
 
     def render(self):
         self.virtual_surface.fill((0, 0, 0))
-
+        self.virtual_surface.blit(self.map_screen,
+                                  (10, 10))
         self.zoom = max(2, min(self.zoom, 3.5))
 
         self.tile_group.draw(self.virtual_surface)
