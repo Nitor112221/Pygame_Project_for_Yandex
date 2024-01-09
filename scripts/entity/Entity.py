@@ -29,6 +29,7 @@ class Entity(pygame.sprite.Sprite):
 
     def update(self, tile_group):
         self.y_speed += self.gravity
+        self.y_speed = min(self.y_speed, 4)
         self.rect.x += self.x_speed
         self.check_collision_x(tile_group)
         self.rect.y += self.y_speed

@@ -58,4 +58,4 @@ class BaseHero(Entity):
         if self.is_grounded:
             self.y_speed += self.jump_speed
             self.status = 'jump_' + self.direction
-        self.is_grounded = False
+            self.is_grounded = False

@@ -5,6 +5,6 @@ eng = {'Play': 'Play',
        'Upward': 'Up',
        'Left': 'Left',
        'Right': 'Right',
-       'Down': 'Down',
+       'Down': 'Downещё',
        'Jump': 'Jump'
        }

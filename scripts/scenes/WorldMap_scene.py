@@ -8,7 +8,8 @@ from data.language import russian, english
 class Tag(pygame.sprite.Sprite):
     def __init__(self, pos_x: int, pos_y: int, level: str, unlock: bool, *group, is_available=False):
         super().__init__(*group)
-        self.image = tools.load_image('WorldMap/tag.png')
+        self.image_list = [tools.load_image('WorldMap/tag.png'), tools.load_image('WorldMap/tag_unlock.png')]
+        self.image = self.image_list[1 if unlock else 0]
         self.rect = self.image.get_rect().move(pos_x, pos_y)
         self.is_available = is_available
         self.scroll_y = 0

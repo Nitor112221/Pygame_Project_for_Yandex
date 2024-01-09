@@ -83,7 +83,7 @@ class Tile(pygame.sprite.Sprite):
     def update(self, player):
         if 'disappearing_block' in self.tile_type:
             if player.rect.move(0, 2).colliderect(self.rect) and not self.disappearing_time:
-                self.disappearing_time = time.time() + 1.5
+                self.disappearing_time = time.time() + 0.6
             if self.disappearing_time is not None and time.time() >= self.disappearing_time:
                 self.image = self.dotted_line.copy()
                 self.is_touchable = False
