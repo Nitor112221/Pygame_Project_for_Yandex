@@ -6,13 +6,14 @@ from data.language import russian, english
 
 
 class Tag(pygame.sprite.Sprite):
-    def __init__(self, pos_x: int, pos_y: int, level: str, *group, is_available=False):
+    def __init__(self, pos_x: int, pos_y: int, level: str, unlock: bool, *group, is_available=False):
         super().__init__(*group)
         self.image = tools.load_image('WorldMap/tag.png')
         self.rect = self.image.get_rect().move(pos_x, pos_y)
         self.is_available = is_available
         self.scroll_y = 0
         self.level = level
+        self.unlock = unlock
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect.move(0, -self.scroll_y))
@@ -31,7 +32,7 @@ class Tag(pygame.sprite.Sprite):
             self.scroll_y = 0
 
     def click(self):
-        if self.scroll_y != 0:
+        if self.scroll_y != 0 and self.unlock:
             global_variable.current_level = self.level
             return True
 
@@ -46,7 +47,8 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
         for coords in file.readline().split(','):
             coords = coords.replace('(', '').replace(')', '')
             coords = coords.split(';')
-            Tag(int(coords[0]), int(coords[1]), str(coords[2]), all_sprite, tag_group)
+            Tag(int(coords[0]), int(coords[1]), str(coords[2]), True if coords[3] == 'True' else False,
+                all_sprite, tag_group)
 
     fps = 60
     clock = pygame.time.Clock()
