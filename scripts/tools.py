@@ -110,6 +110,13 @@ def load_default_options():
     return default_options
 
 
+def is_file_exists(filename):
+    if os.path.exists(filename):
+        return True
+    else:
+        return False
+
+
 def load_user_options():
     default_options = load_default_options()
     # Загрузка пользовательских настроек из файла, с добавлением отсутствующих значений из default_options

@@ -18,6 +18,37 @@ class Tile(pygame.sprite.Sprite):
         # Здесь может быть логика изменения изображения в зависимости от нового типа
 
 
+class Board:
+    def __init__(self, surface):
+        self.surface = surface
+        self.width = surface.get_width()
+        self.height = surface.get_height()
+
+        self.color = pygame.Color(150, 150, 150, 255)
+        self.top = 10
+        self.left = 10
+        self.size = 16
+        self.board = [['.'] * 48 for _ in range(24)]
+        filename = ''
+        if tools.is_file_exists(filename):
+            self.board = tools.load_level(filename)
+
+    def set_view(self, left, top, size):
+        self.top = top
+        self.left = left
+        self.size = size
+
+    def draw(self):
+        for col in range(len(self.board)):
+            for row in range(len(self.board[col])):
+                pygame.draw.rect(self.surface,
+                                 self.color,
+                                 (row * self.size + self.left,
+                                  col * self.size + self.top,
+                                  self.size,
+                                  self.size), 1)
+
+
 class EditorScene:
     def __init__(self, screen, virtual_surface, switch_scene, settings):
         self.screen = screen
@@ -45,6 +76,7 @@ class EditorScene:
 
     def run(self):
         running = True
+        board = Board(self.screen)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -87,6 +119,7 @@ class EditorScene:
             self.mouse_interaction()
             self.update()
             self.render()
+            board.draw()
 
             pygame.display.flip()
             self.clock.tick(self.fps)
