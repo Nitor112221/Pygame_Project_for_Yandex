@@ -4,7 +4,7 @@ import scripts.tools as tools
 
 
 class BaseHero(Entity):
-    def __init__(self, pos_x, pos_y, *group):
+    def __init__(self, pos_x: int, pos_y: int, settings: dict, *group):
         animation = {
             'walk_left': [tools.load_image('player/KnightWalk2.png', reverse=True),
                           tools.load_image('player/KnightIdle2.png', reverse=True),
@@ -31,26 +31,27 @@ class BaseHero(Entity):
         }
 
         super().__init__(tools.load_image('player/Knight.png'), pos_x, pos_y, animation, *group)
+        self.settings = settings
 
     def handler_event(self, event):
         # обработка движений с неотпусканием клавиш
         if event.type == pygame.KEYDOWN:  # начинаем действие
-            if event.key == pygame.K_SPACE:
+            if event.key == getattr(pygame, f"K_{self.settings['Jump'].upper()}"):
                 self.jump()
-            if event.key == pygame.K_LEFT:
+            if event.key == getattr(pygame, f"K_{self.settings['Left'].lower()}"):
                 self.x_speed += -2
-            if event.key == pygame.K_RIGHT:
+            if event.key == getattr(pygame, f"K_{self.settings['Right'].lower()}"):
                 self.x_speed += 2
-            if event.key == pygame.K_DOWN:
+            if event.key == getattr(pygame, f"K_{self.settings['Down'].lower()}"):
                 self.y_speed += 2
         elif event.type == pygame.KEYUP:  # заканчиваем движение
-            if event.key == pygame.K_SPACE:
+            if event.key == getattr(pygame, f"K_{self.settings['Jump'].upper()}"):
                 self.y_speed = max(-2, self.y_speed)
-            if event.key == pygame.K_LEFT:
+            if event.key == getattr(pygame, f"K_{self.settings['Left'].lower()}"):
                 self.x_speed += 2
-            if event.key == pygame.K_RIGHT:
+            if event.key == getattr(pygame, f"K_{self.settings['Right'].lower()}"):
                 self.x_speed -= 2
-            if event.key == pygame.K_DOWN:
+            if event.key == getattr(pygame, f"K_{self.settings['Down'].lower()}"):
                 self.y_speed = max(self.y_speed, self.y_speed - 2)
 
     def jump(self):

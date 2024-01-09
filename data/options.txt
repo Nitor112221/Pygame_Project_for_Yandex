@@ -4,3 +4,4 @@ Left A
 Right D
 Backward S
 Jump Space
+Down S

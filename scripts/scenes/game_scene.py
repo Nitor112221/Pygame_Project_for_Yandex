@@ -24,7 +24,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     # загрузка 1 лвл, создание игрока и базового перемещения камеры
     level_x, level_y, orientation_tile = tools.generate_level(tools.load_level(global_variable.current_level),
                                                               (all_sprites, tiles_group))
-    player = BaseHero(24, 1, all_sprites, player_group)
+    player = BaseHero(24, 1, settings, all_sprites, player_group)
     camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
 
     running = True
