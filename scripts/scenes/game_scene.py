@@ -4,6 +4,7 @@ from scripts.entity.BaseHero import BaseHero
 
 from data.language import russian, english
 from scripts.camera import Camera
+import global_variable
 
 
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
@@ -21,7 +22,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     player_group = pygame.sprite.Group()
 
     # загрузка 1 лвл, создание игрока и базового перемещения камеры
-    level_x, level_y, orientation_tile = tools.generate_level(tools.load_level('level_1'), (all_sprites, tiles_group))
+    level_x, level_y, orientation_tile = tools.generate_level(tools.load_level(global_variable.current_level),
+                                                              (all_sprites, tiles_group))
     player = BaseHero(24, 1, all_sprites, player_group)
     camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
 

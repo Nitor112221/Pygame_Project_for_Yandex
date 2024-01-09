@@ -1,15 +1,18 @@
 import pygame
 import scripts.tools as tools
+from scripts.scenes.game_scene import game_scene
+import global_variable
 from data.language import russian, english
 
 
 class Tag(pygame.sprite.Sprite):
-    def __init__(self, pos_x: int, pos_y: int, *group, is_available=False):
+    def __init__(self, pos_x: int, pos_y: int, level: str, *group, is_available=False):
         super().__init__(*group)
         self.image = tools.load_image('WorldMap/tag.png')
         self.rect = self.image.get_rect().move(pos_x, pos_y)
         self.is_available = is_available
         self.scroll_y = 0
+        self.level = level
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect.move(0, -self.scroll_y))
@@ -27,6 +30,11 @@ class Tag(pygame.sprite.Sprite):
         else:
             self.scroll_y = 0
 
+    def click(self):
+        if self.scroll_y != 0:
+            global_variable.current_level = self.level
+            return True
+
 
 def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
     world_map = tools.load_image('WorldMap/map_world_with_path.png')
@@ -38,7 +46,7 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
         for coords in file.readline().split(','):
             coords = coords.replace('(', '').replace(')', '')
             coords = coords.split(';')
-            Tag(int(coords[0]), int(coords[1]), all_sprite, tag_group)
+            Tag(int(coords[0]), int(coords[1]), str(coords[2]), all_sprite, tag_group)
 
     fps = 60
     clock = pygame.time.Clock()
@@ -65,6 +73,10 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
                 start_pos = pygame.mouse.get_pos()
+                for sprite in tag_group:
+                    if sprite.click():
+                        running = False
+                        switch_scene(game_scene)
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 dragging = False
             elif event.type == pygame.KEYDOWN:

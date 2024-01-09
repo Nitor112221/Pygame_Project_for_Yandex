@@ -6,7 +6,6 @@ import scripts.tools as tools
 # проводим инициализацию pygame
 pygame.init()
 
-
 default_options = tools.load_default_options()
 settings = tools.load_user_options()
 # Теперь user_options содержит значения из options.txt, и отсутствующие настройки добавлены из default_options
