@@ -3,10 +3,20 @@ import scripts.tools as tools
 from data.language import russian, english
 
 
-class Tile(pygame.sprite.Sprite):
-    def __init__(self, *groups):
-        super().__init__(*groups)
-        self.image = tools.load_image('path/to/your/tile/image.png')  # Замените путь на свой
+class Tile:
+    def __init__(self, screen, group):
+        super().__init__()
+        # self.image = tools.load_image('path/to/your/tile/image.png')
+
+        self.screen = screen
+        self.group = group
+        self.screen_width = screen.get_width()
+        self.screen_height = screen.get_height()
+
+        self.color = pygame.Color(70, 70, 70, 255)
+        self.bottom = 10
+        self.left = 10
+        self.sell_size = 48
 
         self.tile_images = {
             '1': tools.load_image('platform/platform.png'),
@@ -20,9 +30,16 @@ class Tile(pygame.sprite.Sprite):
             '9': tools.load_image('disappearing_block/disappearing_block_3.png', -2)
         }
 
-    def draw(self, surface):
-        pass
-        # for key, value in self.tile_images.items():
+    def draw(self):
+        current_index = 0
+        for key, value in self.tile_images.items():
+            image = pygame.sprite.Sprite(self.group)
+            scaled_image = pygame.transform.scale(value, (self.sell_size, self.sell_size))
+            image.image = scaled_image
+            image.rect = image.image.get_rect()
+            image.rect.x, image.rect.y = current_index * self.sell_size + current_index * self.left, \
+                self.screen_height - self.sell_size - self.bottom
+            current_index += 1
 
     # Добавьте метод для изменения типа тайла
     def change_tile_type(self):
@@ -113,7 +130,7 @@ class EditorScene:
     def run(self):
         running = True
         board = Board(self.screen)
-        # Tile(self.tile_group)
+        Tile(self.screen, self.tile_group).draw()
         # (mouse_pos[0] + self.scroll_x) / self.zoom,
         # (mouse_pos[1] + self.scroll_y) / self.zoom,
         while running:
@@ -169,6 +186,7 @@ class EditorScene:
             self.update()
             self.render()
             board.draw()
+            self.tile_group.draw(self.screen)
 
             pygame.display.flip()
             self.clock.tick(self.fps)
