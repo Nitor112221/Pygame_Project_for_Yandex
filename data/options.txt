@@ -2,6 +2,5 @@ Language Русский
 Upward W
 Left A
 Right D
-Backward S
-Jump Space
 Down S
+Jump Space
