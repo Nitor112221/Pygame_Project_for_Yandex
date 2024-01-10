@@ -4,13 +4,41 @@ from data.language import russian, english
 
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, tile_type, pos_x, pos_y, *groups, is_touchable=True):
+    def __init__(self, screen, *groups):
         super().__init__(*groups)
-        self.tile_type = tile_type
-        self.is_touchable = is_touchable
-        self.image = tools.load_image('path/to/your/tile/image.png')  # Замените путь на свой
-        self.rect = self.image.get_rect().move(
-            8 * pos_x, 8 * pos_y)
+        self.screen = screen
+        self.screen_w = screen.get_width()
+        self.screen_h = screen.get_height()
+
+        self.color = pygame.Color(150, 150, 150, 255)
+        self.bottom = 10
+        self.left = 10
+        self.cell_size = 16
+        current_index = 0
+
+        self.tile_images = {
+            '1': tools.load_image('platform/platform.png'),
+            '2': tools.load_image('platform/platform_horizontal.png'),
+            '3': tools.load_image('platform/platform_vertical.png'),
+            '4': tools.load_image('platform/platform.png'),
+            '5': tools.load_image('platform/platform_horizontal.png'),
+            '6': tools.load_image('platform/platform_vertical.png'),
+            '7': tools.load_image('disappearing_block/disappearing_block_1.png', -2),
+            '8': tools.load_image('disappearing_block/disappearing_block_2.png', -2),
+            '9': tools.load_image('disappearing_block/disappearing_block_3.png', -2)
+        }
+
+        for key, value in self.tile_images.items():
+            # Изменяем размер картинки тайла
+            scaled_image = pygame.transform.scale(value, (self.cell_size, self.cell_size))
+
+            self.image = scaled_image
+            self.rect = self.image.get_rect()
+            index_clone = current_index + 1
+            self.rect.x = current_index * self.cell_size + index_clone * self.left
+            self.rect.y = self.screen_h - self.cell_size - self.bottom
+            current_index += 1
+        current_index = 0
 
     # Добавьте метод для изменения типа тайла
     def change_tile_type(self, new_tile_type):
@@ -94,6 +122,7 @@ class EditorScene:
     def run(self):
         running = True
         board = Board(self.map_screen)
+        Tile(self.screen, self.tile_group)
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
