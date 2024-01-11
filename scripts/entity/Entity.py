@@ -80,7 +80,10 @@ class Entity(pygame.sprite.Sprite):
             self.status = 'classic_' + self.direction
 
     def animate(self):
-        animation = self.animation[self.status]
+        try:
+            animation = self.animation[self.status]
+        except KeyError:
+            animation = self.animation['classic_right']
 
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):

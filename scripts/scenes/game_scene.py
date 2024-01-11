@@ -5,6 +5,7 @@ from scripts.entity.BaseHero import BaseHero
 from data.language import russian, english
 from scripts.camera import Camera
 import global_variable
+from scripts.entity.Goblin import Goblin
 
 
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
@@ -20,11 +21,17 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
+    enemy = pygame.sprite.Group()
 
     # загрузка 1 лвл, создание игрока и базового перемещения камеры
     level_x, level_y, orientation_tile = tools.generate_level(tools.load_level(global_variable.current_level),
                                                               (all_sprites, tiles_group))
     player = BaseHero(24, 1, settings, all_sprites, player_group)
+    with open('data/levels/' + global_variable.current_level + '_enemy', 'r') as file:
+        for coords in file.readline().split(','):
+            coords = coords.replace('(', '').replace(')', '')
+            coords = coords.split(';')
+            Goblin(int(coords[0]), int(coords[1]), all_sprites, enemy)
     camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
 
     running = True
@@ -44,9 +51,11 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             camera.apply(sprite)
 
         tiles_group.update(player)
+        enemy.update(tiles_group)
         player_group.update(tiles_group)
         # отображаем все тайлы и игрока
         tiles_group.draw(virtual_surface)
+        enemy.draw(virtual_surface)
         player_group.draw(virtual_surface)
 
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
