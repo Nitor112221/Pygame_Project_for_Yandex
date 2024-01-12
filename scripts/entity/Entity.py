@@ -2,7 +2,7 @@ import pygame
 
 
 class Entity(pygame.sprite.Sprite):
-    gravity = 0.15
+    gravity = 0.135
 
     def __init__(self, image: pygame.Surface, pos_x, pos_y, animation: dict, *group):
         super().__init__(*group)
@@ -12,7 +12,7 @@ class Entity(pygame.sprite.Sprite):
         self.x_speed = 0
         self.y_speed = 0
         self.jump_speed = -4
-        # Мертв ли игрок или нет
+        # Мертво ли существо или нет
         self.is_dead = False
         # Стоит ли игрок на земле или нет
         self.is_grounded = False

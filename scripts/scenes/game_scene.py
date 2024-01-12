@@ -46,6 +46,10 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                 switch_scene(None)
             player.handler_event(event)
 
+        if not player.is_alive():
+            running = False
+            switch_scene(game_scene)
+
         virtual_surface.fill((0, 0, 0))
 
         # изменяем ракурс камеры
