@@ -76,7 +76,7 @@ class BaseHero(Entity):
             self.invulnerability = False
         if not self.invulnerability:
             for sprite in tile_group:
-                if sprite.tile_type == 'spike' and self.rect.colliderect(sprite.rect):
+                if sprite.tile_type == 'spike' and pygame.sprite.collide_mask(self, sprite):
                     self.get_damage(15)
                     break
         super().update(tile_group)

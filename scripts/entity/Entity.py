@@ -2,7 +2,7 @@ import pygame
 
 
 class Entity(pygame.sprite.Sprite):
-    gravity = 0.1
+    gravity = 0.15
 
     def __init__(self, image: pygame.Surface, pos_x, pos_y, animation: dict, *group):
         super().__init__(*group)
