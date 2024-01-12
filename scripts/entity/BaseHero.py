@@ -1,6 +1,7 @@
 from scripts.entity.Entity import Entity
 import pygame
 import scripts.tools as tools
+import time
 
 
 class BaseHero(Entity):
@@ -31,6 +32,8 @@ class BaseHero(Entity):
         }
 
         super().__init__(tools.load_image('player/Knight.png'), pos_x, pos_y, animation, *group)
+        self.invulnerability = False
+        self.time_invulnerability = None
         self.settings = settings
 
     def handler_event(self, event):
@@ -59,3 +62,20 @@ class BaseHero(Entity):
             self.y_speed += self.jump_speed
             self.status = 'jump_' + self.direction
             self.is_grounded = False
+
+    def get_damage(self, amount):
+        if not self.invulnerability:
+            super().get_damage(amount)
+            self.invulnerability = True
+            self.time_invulnerability = time.time() + 0.3
+
+    def update(self, tile_group):
+        if self.time_invulnerability is not None and time.time() >= self.time_invulnerability:
+            self.time_invulnerability = None
+            self.invulnerability = False
+        for sprite in tile_group:
+            if sprite.tile_type == 'spike' and self.rect.colliderect(sprite.rect):
+                if not self.invulnerability:
+                    self.get_damage(15)
+                    break
+        super().update(tile_group)

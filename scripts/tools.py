@@ -50,7 +50,8 @@ def tile_init():
         'platform_vertical': load_image('platform/platform_vertical.png'),
         'disappearing_block1': load_image('disappearing_block/disappearing_block_1.png', -2),
         'disappearing_block2': load_image('disappearing_block/disappearing_block_2.png', -2),
-        'disappearing_block3': load_image('disappearing_block/disappearing_block_3.png', -2)
+        'disappearing_block3': load_image('disappearing_block/disappearing_block_3.png', -2),
+        'spike': load_image('spike/spike_classic.png')
     }
 
     tile_width = tile_height = 8  # размеры 1 тайла
@@ -176,6 +177,8 @@ def generate_level(level, group):
                 Tile('disappearing_block2', x, y, *group)
             elif level[y][x] == '9':
                 Tile('disappearing_block3', x, y, *group)
+            elif level[y][x] == 's':
+                Tile('spike', x, y, *group, is_touchable=False)
     tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры
     # вернем размеры поля и оринтеровочный Tile

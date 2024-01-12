@@ -26,6 +26,8 @@ class Entity(pygame.sprite.Sprite):
         self.direction = 'right'
         self.frame_index = 0
         self.animation_speed = 0.15
+        self.hp = 100
+        self.max_hp = 100
 
     def update(self, tile_group):
         self.y_speed += self.gravity
@@ -90,3 +92,15 @@ class Entity(pygame.sprite.Sprite):
             self.frame_index = 0
 
         self.image = animation[int(self.frame_index)]
+
+    def is_alive(self):
+        if self.hp:
+            return True
+        else:
+            return False
+
+    def get_damage(self, amount):
+        self.hp -= amount
+        if self.hp <= 0:
+            self.hp = False
+        return self.hp

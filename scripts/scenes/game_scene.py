@@ -56,9 +56,11 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         # отображаем все тайлы и игрока
         tiles_group.draw(virtual_surface)
         for en in enemy:
-            en.draw(virtual_surface)
+            if en.rect.top >= level_y * 8:
+                en.kill()
+            else:
+                en.draw(virtual_surface)
         player_group.draw(virtual_surface)
-
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
