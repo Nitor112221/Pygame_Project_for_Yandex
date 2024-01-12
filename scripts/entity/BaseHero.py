@@ -67,15 +67,16 @@ class BaseHero(Entity):
         if not self.invulnerability:
             super().get_damage(amount)
             self.invulnerability = True
-            self.time_invulnerability = time.time() + 0.3
+            self.time_invulnerability = time.time() + 0.5
+            print(self.hp)
 
     def update(self, tile_group):
         if self.time_invulnerability is not None and time.time() >= self.time_invulnerability:
             self.time_invulnerability = None
             self.invulnerability = False
-        for sprite in tile_group:
-            if sprite.tile_type == 'spike' and self.rect.colliderect(sprite.rect):
-                if not self.invulnerability:
+        if not self.invulnerability:
+            for sprite in tile_group:
+                if sprite.tile_type == 'spike' and self.rect.colliderect(sprite.rect):
                     self.get_damage(15)
                     break
         super().update(tile_group)

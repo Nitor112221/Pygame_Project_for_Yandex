@@ -102,5 +102,5 @@ class Entity(pygame.sprite.Sprite):
     def get_damage(self, amount):
         self.hp -= amount
         if self.hp <= 0:
-            self.hp = False
+            self.hp = 0
         return self.hp

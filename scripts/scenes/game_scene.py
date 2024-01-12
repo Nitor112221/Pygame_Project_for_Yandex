@@ -33,9 +33,13 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             coords = coords.split(';')
             Goblin(int(coords[0]), int(coords[1]), all_sprites, enemy)
     camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
-
+    heal_bar = pygame.Surface((100, 15))
+    heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
+    heal_bar.set_colorkey((35, 64, 128))
     running = True
     while running:
+        heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
+        heal_bar.set_colorkey((35, 64, 128))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -53,6 +57,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         tiles_group.update(player)
         enemy.update(player, tiles_group)
         player_group.update(tiles_group)
+        if player.rect.top >= virtual_surface.get_height():
+            player.get_damage(9999999999999999999999999999999)
         # отображаем все тайлы и игрока
         tiles_group.draw(virtual_surface)
         for en in enemy:
@@ -61,6 +67,16 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             else:
                 en.draw(virtual_surface)
         player_group.draw(virtual_surface)
+
+        pygame.draw.rect(heal_bar, (193, 0, 0),
+                         pygame.Rect(0, 0, int((heal_bar.get_width()) * (player.hp / player.max_hp)),
+                                     heal_bar.get_height() - 8), 0, 20)
+        pygame.draw.rect(heal_bar, (220, 220, 220),
+                         pygame.Rect(0, 0, heal_bar.get_width(), heal_bar.get_height() - 8), 1,
+                         20)
+
+        virtual_surface.blit(heal_bar, (5, 5))
+
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
