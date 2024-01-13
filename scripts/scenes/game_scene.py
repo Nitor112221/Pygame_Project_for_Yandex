@@ -6,6 +6,7 @@ from data.language import russian, english
 from scripts.camera import Camera
 import global_variable
 from scripts.entity.Goblin import Goblin
+from scripts.scenes.dead_screen import DeadScreen
 
 
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
@@ -22,7 +23,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     enemy = pygame.sprite.Group()
-
+    dead_scene = None
+    is_activity = True
     # загрузка 1 лвл, создание игрока и базового перемещения камеры
     level_x, level_y, orientation_tile = tools.generate_level(tools.load_level(global_variable.current_level),
                                                               (all_sprites, tiles_group))
@@ -44,11 +46,12 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             if event.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
-            player.handler_event(event)
+            if is_activity:
+                player.handler_event(event)
 
         if not player.is_alive():
-            running = False
-            switch_scene(game_scene)
+            dead_scene = DeadScreen(virtual_surface)
+            is_activity = False
 
         virtual_surface.fill((0, 0, 0))
 
@@ -60,7 +63,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
 
         tiles_group.update(player)
         enemy.update(player, tiles_group)
-        player_group.update(tiles_group)
+        if is_activity:
+            player_group.update(tiles_group)
         if player.rect.top >= virtual_surface.get_height():
             player.get_damage(9999999999999999999999999999999)
         # отображаем все тайлы и игрока
@@ -80,7 +84,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                          20)
 
         virtual_surface.blit(heal_bar, (5, 5))
-
+        if dead_scene is not None:
+            dead_scene.draw()
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
