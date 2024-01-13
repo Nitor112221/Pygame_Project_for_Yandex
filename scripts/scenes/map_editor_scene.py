@@ -73,6 +73,7 @@ class Board:
         self.cell_size = 16
         self.board = [['.'] * 48 for _ in range(24)]
         self.coordinate_cell = []
+        self.stack_action = []  # тут храним стек всех добавленных координат на начало сцены
 
         if tools.is_file_exists(filename):
             self.board = tools.load_level(filename)
@@ -81,12 +82,6 @@ class Board:
                 for j in range(len(self.board[i])):
                     new_board[i][j] = self.board[i][j]
             self.board = new_board
-
-
-            # new_board = [[-1] * len(self.board[_]) for _ in range(len(self.board))]
-            # for i in range(len(self.board)):
-            #     for j in range(len(self.board[i])):
-            #         new_board[i][j] = self.board[i][j]
 
         self.tile_images = {
             '1': tools.load_image('platform/platform.png'),
@@ -136,6 +131,26 @@ class Board:
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
+    def back_render(self):
+        if len(self.stack_action) != 0:
+            cur_elem_stack = self.stack_action[-1]
+            color = pygame.Color((0, 0, 0))
+            self.draw_rect(self.surface,
+                           color,
+                           cur_elem_stack[0][0],
+                           cur_elem_stack[0][1],
+                           self.cell_size,
+                           self.cell_size,
+                           1)
+            self.board[cur_elem_stack[1][0]][cur_elem_stack[1][1]] = '.'
+            del self.stack_action[-1]
+
+    def clear_board(self):
+        for col in range(len(self.board)):
+            for row in range(len(self.board[col])):
+                self.board[col][row] = '.'
+        self.draw()
+
     def draw_rect(self, surface, color, coor_x, coor_y, size_x, size_y, gauge):
         pygame.draw.rect(surface,
                          color,
@@ -153,12 +168,49 @@ class Board:
                         (self.coordinate_cell[i][j][1] + self.cell_size) and \
                         coor[1] < self.height - 58:
 
+                    # Добавляем координаты последнего добавленного спрайта
+                    self.stack_action.append([(self.coordinate_cell[i][j][0],
+                                             self.coordinate_cell[i][j][1]), (i, j)])
+
                     if current_tile is not None:
                         self.board[i][j] = id_
 
                     # print(self.coordinate_cell[i][j][0],
                     #       self.coordinate_cell[i][j][1])
                     # print(f'{(i, j)}')
+
+
+class Button:
+    def __init__(self, screen):
+        self.screen = screen
+        self.width_screen = screen.get_width()
+        self.height_screen = screen.get_height()
+        self.width = 30
+        self.height = 30
+        self.right = 10
+        self.bottom = 10
+        self.coor_x = self.width_screen - self.width - self.right
+        self.coor_y = self.height_screen - self.height - self.bottom
+        self.group = pygame.sprite.Group()
+
+        self.tile_images = {
+            1: tools.load_image('menu_buttons/editor_back.png')
+        }
+
+    def render(self):
+        for key, value in self.tile_images.items():
+            btn = pygame.sprite.Sprite(self.group)
+            scaled_image = pygame.transform.scale(value, (self.width, self.height))
+            btn.image = scaled_image
+            btn.rect = btn.image.get_rect()
+            btn.rect.x, btn.rect.y = self.coor_x, self.coor_y
+        self.group.draw(self.screen)
+
+    def chek_clicked(self, coords):
+        for sprite in self.group:
+            if sprite.rect.collidepoint(coords):
+                return sprite
+        return None
 
 
 class EditorScene:
@@ -175,6 +227,7 @@ class EditorScene:
         self.filename = 'level_2'
         self.board = Board(self.screen, self.filename)
         self.tile = Tile(self.screen)
+        self.button = Button(self.screen)
 
         self.run()
 
@@ -203,20 +256,16 @@ class EditorScene:
                 mouse_pressed = pygame.mouse.get_pressed()
                 if mouse_pressed[0]:  # 0 соответствует левой кнопке мыши
                     # Меняем выбранный тайл на новый, если нажали на него
-                    return_click = self.tile.chek_clicked(event.pos)
-                    if return_click is not None:
-                        self.current_tile = return_click[0]
-                        self.id_ = return_click[1]
+                    return_click_on_tile = self.tile.chek_clicked(event.pos)
+                    if return_click_on_tile is not None:
+                        self.current_tile = return_click_on_tile[0]
+                        self.id_ = return_click_on_tile[1]
                     self.board.chek_clicked_on_board(event.pos, self.current_tile, self.id_)
 
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    pass
-                    # # Меняем выбранный тайл на новый, если нажали на него
-                    # return_click = self.tile.chek_clicked(event.pos)
-                    # if return_click is not None:
-                    #     self.current_tile = return_click[0]
-                    #     self.id_ = return_click[1]
-                    # self.board.chek_clicked_on_board(event.pos, self.current_tile, self.id_)
+                    # Если нажали на кнопку отмены действия и действия были накоплены - отменяем его
+                    return_click_on_btn = self.button.chek_clicked(event.pos)
+                    if return_click_on_btn is not None:
+                        self.board.back_render()
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                     # Если колесико вверх - увеличиваем размер сторон ячеек доски
@@ -229,10 +278,13 @@ class EditorScene:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         self.save_board_file(self.filename)
+                    elif event.key == pygame.K_CAPSLOCK:
+                        self.board.clear_board()
 
             self.render()
             self.board.draw()
             Tile(self.screen)
+            self.button.render()
             pygame.display.flip()
             self.clock.tick(self.fps)
 
@@ -245,7 +297,6 @@ class EditorScene:
     def save_board_file(self, filename):
         file_path = 'data/levels/' + filename
         board = self.board.board
-        print(board)
 
         # Очищаем содержимое файла для загрузки а него новой карты уровня
         with open(file_path, 'w') as file_level:
