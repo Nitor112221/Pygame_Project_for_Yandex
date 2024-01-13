@@ -74,17 +74,28 @@ class Board:
         self.board = [['.'] * 48 for _ in range(24)]
         self.coordinate_cell = []
 
-        filename = ''
+        filename = 'level_1'
         if tools.is_file_exists(filename):
             self.board = tools.load_level(filename)
+            new_board = [['.'] * len(self.board[_]) for _ in range(len(self.board))]
+            for i in range(len(self.board)):
+                for j in range(len(self.board[i])):
+                    new_board[i][j] = self.board[i][j]
+            self.board = new_board
+
+
+            # new_board = [[-1] * len(self.board[_]) for _ in range(len(self.board))]
+            # for i in range(len(self.board)):
+            #     for j in range(len(self.board[i])):
+            #         new_board[i][j] = self.board[i][j]
 
         self.tile_images = {
             '1': tools.load_image('platform/platform.png'),
             '2': tools.load_image('platform/platform_horizontal.png'),
             '3': tools.load_image('platform/platform_vertical.png'),
-            '4': tools.load_image('platform/platform.png'),
-            '5': tools.load_image('platform/platform_horizontal.png'),
-            '6': tools.load_image('platform/platform_vertical.png'),
+            '4-': tools.load_image('platform/platform.png'),
+            '5-': tools.load_image('platform/platform_horizontal.png'),
+            '6-': tools.load_image('platform/platform_vertical.png'),
             '7': tools.load_image('disappearing_block/disappearing_block_1.png', -2),
             '8': tools.load_image('disappearing_block/disappearing_block_2.png', -2),
             '9': tools.load_image('disappearing_block/disappearing_block_3.png', -2),
@@ -111,7 +122,12 @@ class Board:
 
                 if self.board[col][row] != '.':
                     surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))
-                    image = self.tile_images[str(self.board[col][row] + 1)]
+                    try:
+                        image = self.tile_images[str(int(self.board[col][row]) + 1)]
+                    except KeyError:
+                        image = self.tile_images[f'{str(int(self.board[col][row]) + 1)}-']
+                        image.set_alpha(180)
+
                     scale_image = pygame.transform.scale(image, (self.cell_size - 2, self.cell_size - 2))
                     surface.blit(scale_image, (0, 0))
                     self.surface.blit(surface, (row * self.cell_size + self.left + 1,
@@ -156,12 +172,14 @@ class EditorScene:
         self.id_ = None
         self.fps = 60
         self.clock = pygame.time.Clock()
+
+        self.board = Board(self.screen)
+        self.tile = Tile(self.screen)
+
         self.run()
 
     def run(self):
         running = True
-        board = Board(self.screen)
-        tile = Tile(self.screen)
         while running:
 
             keys = pygame.key.get_pressed()
@@ -169,37 +187,47 @@ class EditorScene:
                 running = False
                 self.switch_scene('menu_scene')
             if keys[pygame.K_LEFT]:
-                board.left -= 10
+                self.board.left += 10
             if keys[pygame.K_RIGHT]:
-                board.left += 10
+                self.board.left -= 10
             if keys[pygame.K_DOWN]:
-                board.top += 10
+                self.board.top -= 10
             if keys[pygame.K_UP]:
-                board.top -= 10
+                self.board.top += 10
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                     self.switch_scene(None)
 
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pressed = pygame.mouse.get_pressed()
+                if mouse_pressed[0]:  # 0 соответствует левой кнопке мыши
                     # Меняем выбранный тайл на новый, если нажали на него
-                    return_click = tile.chek_clicked(event.pos)
+                    return_click = self.tile.chek_clicked(event.pos)
                     if return_click is not None:
                         self.current_tile = return_click[0]
                         self.id_ = return_click[1]
-                    board.chek_clicked_on_board(event.pos, self.current_tile, self.id_)
+                    self.board.chek_clicked_on_board(event.pos, self.current_tile, self.id_)
+
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    pass
+                    # # Меняем выбранный тайл на новый, если нажали на него
+                    # return_click = self.tile.chek_clicked(event.pos)
+                    # if return_click is not None:
+                    #     self.current_tile = return_click[0]
+                    #     self.id_ = return_click[1]
+                    # self.board.chek_clicked_on_board(event.pos, self.current_tile, self.id_)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                     # Если колесико вверх - увеличиваем размер сторон ячеек доски
-                    board.cell_size += 1
+                    self.board.cell_size += 1
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
                     # Если колесико вниз - увеличиваем размер сторон ячеек доски до миниального размера = 8
-                    if board.cell_size > 16:
-                        board.cell_size -= 1
+                    if self.board.cell_size > 8:
+                        self.board.cell_size -= 1
 
             self.render()
-            board.draw()
+            self.board.draw()
             Tile(self.screen)
             pygame.display.flip()
             self.clock.tick(self.fps)
@@ -209,3 +237,7 @@ class EditorScene:
 
         scaled_surface = pygame.transform.scale(self.virtual_surface, self.screen.get_size())
         self.screen.blit(scaled_surface, (0, 0))
+
+    def save_board_file(self):
+        pass
+

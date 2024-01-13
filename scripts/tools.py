@@ -111,10 +111,10 @@ def load_default_options():
 
 
 def is_file_exists(filename):
-    if os.path.exists(filename):
+    file_path = 'data/levels/' + filename
+    if os.path.exists(file_path):
         return True
-    else:
-        return False
+    return False
 
 
 def load_user_options():
