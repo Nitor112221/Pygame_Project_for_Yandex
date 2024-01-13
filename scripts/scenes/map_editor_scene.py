@@ -62,7 +62,7 @@ class Tile:
 
 
 class Board:
-    def __init__(self, surface):
+    def __init__(self, surface, filename):
         self.surface = surface
         self.width = surface.get_width()
         self.height = surface.get_height()
@@ -74,7 +74,6 @@ class Board:
         self.board = [['.'] * 48 for _ in range(24)]
         self.coordinate_cell = []
 
-        filename = 'level_1'
         if tools.is_file_exists(filename):
             self.board = tools.load_level(filename)
             new_board = [['.'] * len(self.board[_]) for _ in range(len(self.board))]
@@ -173,7 +172,8 @@ class EditorScene:
         self.fps = 60
         self.clock = pygame.time.Clock()
 
-        self.board = Board(self.screen)
+        self.filename = 'level_2'
+        self.board = Board(self.screen, self.filename)
         self.tile = Tile(self.screen)
 
         self.run()
@@ -226,6 +226,10 @@ class EditorScene:
                     if self.board.cell_size > 8:
                         self.board.cell_size -= 1
 
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        self.save_board_file(self.filename)
+
             self.render()
             self.board.draw()
             Tile(self.screen)
@@ -238,6 +242,15 @@ class EditorScene:
         scaled_surface = pygame.transform.scale(self.virtual_surface, self.screen.get_size())
         self.screen.blit(scaled_surface, (0, 0))
 
-    def save_board_file(self):
-        pass
+    def save_board_file(self, filename):
+        file_path = 'data/levels/' + filename
+        board = self.board.board
+        print(board)
 
+        # Очищаем содержимое файла для загрузки а него новой карты уровня
+        with open(file_path, 'w') as file_level:
+            file_level.write('')
+
+        with open(file_path, mode='a', encoding='utf8') as file_level:
+            for row in board:
+                file_level.write(f'''{''.join(map(lambda x: str(x), row))}\n''')

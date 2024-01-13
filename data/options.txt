@@ -1,4 +1,4 @@
-Language English
+Language Русский
 Upward W
 Left A
 Right D
