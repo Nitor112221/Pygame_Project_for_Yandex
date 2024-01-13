@@ -2,7 +2,6 @@ import pygame
 import scripts.tools as tools
 from scripts.entity.BaseHero import BaseHero
 
-from data.language import russian, english
 from scripts.camera import Camera
 import global_variable
 from scripts.entity.Goblin import Goblin
@@ -49,8 +48,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             if is_activity:
                 player.handler_event(event)
 
-        if not player.is_alive():
-            dead_scene = DeadScreen(virtual_surface)
+        if not player.is_alive() and dead_scene is None:
+            dead_scene = DeadScreen(virtual_surface, settings)
             is_activity = False
 
         virtual_surface.fill((0, 0, 0))
@@ -85,6 +84,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
 
         virtual_surface.blit(heal_bar, (5, 5))
         if dead_scene is not None:
+            dead_scene.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface), switch_scene)
             dead_scene.draw()
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
