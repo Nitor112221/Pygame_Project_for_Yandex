@@ -56,6 +56,10 @@ class BaseHero(Entity):
                 self.x_speed -= 2
             if event.key == getattr(pygame, f"K_{self.settings['Down'].lower()}"):
                 self.y_speed = max(self.y_speed, self.y_speed - 2)
+        key = pygame.key.get_pressed()
+        if not (key[getattr(pygame, f"K_{self.settings['Left'].lower()}")] or key[
+                getattr(pygame, f"K_{self.settings['Right'].lower()}")]):
+            self.x_speed = 0
 
     def jump(self):
         if self.is_grounded:

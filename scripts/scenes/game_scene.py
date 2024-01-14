@@ -6,6 +6,7 @@ from scripts.camera import Camera
 import global_variable
 from scripts.entity.Goblin import Goblin
 from scripts.scenes.dead_screen import DeadScreen
+from scripts.scenes.pause_scene import PauseScene
 
 
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
@@ -24,6 +25,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     enemy = pygame.sprite.Group()
     dead_scene = None
     is_activity = True
+    is_pause = False
+    pause_scene = None
     # загрузка 1 лвл, создание игрока и базового перемещения камеры
     level_x, level_y, orientation_tile = tools.generate_level(tools.load_level(global_variable.current_level),
                                                               (all_sprites, tiles_group))
@@ -51,8 +54,21 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                                                switch_scene)
                     if result is not None:
                         running = False
-
-            if is_activity:
+                if pause_scene is not None:
+                    result = pause_scene.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface),
+                                                switch_scene)
+                    if result == 'continue':
+                        is_pause = False
+                        pause_scene = None
+                    if result == 'map':
+                        running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                is_pause = not is_pause
+                if is_pause:
+                    pause_scene = PauseScene(virtual_surface, settings)
+                else:
+                    pause_scene = None
+            if is_activity and not is_pause:
                 player.handler_event(event)
 
         if not player.is_alive() and dead_scene is None:
@@ -67,12 +83,13 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         for sprite in all_sprites:
             camera.apply(sprite)
 
-        tiles_group.update(player)
-        enemy.update(player, tiles_group)
-        if is_activity:
-            player_group.update(tiles_group)
-        if player.rect.top >= virtual_surface.get_height():
-            player.get_damage(9999999999999999999999999999999)
+        if not is_pause:
+            tiles_group.update(player)
+            enemy.update(player, tiles_group)
+            if is_activity:
+                player_group.update(tiles_group)
+            if player.rect.top >= virtual_surface.get_height():
+                player.get_damage(9999999999999999999999999999999)
         # отображаем все тайлы и игрока
         tiles_group.draw(virtual_surface)
         for en in enemy:
@@ -92,6 +109,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         virtual_surface.blit(heal_bar, (5, 5))
         if dead_scene is not None:
             dead_scene.draw()
+        if pause_scene is not None and is_pause:
+            pause_scene.draw()
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))

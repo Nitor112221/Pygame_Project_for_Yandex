@@ -9,5 +9,6 @@ eng = {'Play': 'Play',
        'Jump': 'Jump',
        'Map': 'Map',
        'Repeat': 'Repeat',
-       'Menu': 'Menu'
+       'Menu': 'Menu',
+       'Сontinue': 'Continue'
        }
