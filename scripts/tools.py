@@ -51,7 +51,16 @@ def tile_init():
         'disappearing_block1': load_image('disappearing_block/disappearing_block_1.png', -2),
         'disappearing_block2': load_image('disappearing_block/disappearing_block_2.png', -2),
         'disappearing_block3': load_image('disappearing_block/disappearing_block_3.png', -2),
-        'spike': load_image('spike/spike_classic.png')
+        'spike': load_image('spike/spike_classic.png'),
+        'dirt': load_image('dirt/dirt.png'),
+        'dirtu': load_image('dirt/dirt_up.png'),
+        'dirth': load_image('dirt/dirt_down.png'),
+        'dirtl': load_image('dirt/dirt_left.png'),
+        'dirtr': load_image('dirt/dirt_right.png'),
+        'dirtq': load_image('dirt/dirt_up_left.png'),
+        'dirtw': load_image('dirt/dirt_down_left.png'),
+        'dirte': load_image('dirt/dirt_up_right.png'),
+        'dirtt': load_image('dirt/dirt_down_right.png')
     }
 
     tile_width = tile_height = 8  # размеры 1 тайла
@@ -179,6 +188,43 @@ def generate_level(level, group):
                 Tile('disappearing_block3', x, y, *group)
             elif level[y][x] == 's':
                 Tile('spike', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'd':
+                Tile('dirt', x, y, *group)
+            elif level[y][x] == 'D':
+                Tile('dirt', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'u':
+                Tile('dirtu', x, y, *group)
+            elif level[y][x] == 'U':
+                Tile('dirtu', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'h':
+                Tile('dirth', x, y, *group)
+            elif level[y][x] == 'H':
+                Tile('dirth', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'l':
+                Tile('dirtl', x, y, *group)
+            elif level[y][x] == 'L':
+                Tile('dirtl', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'r':
+                Tile('dirtr', x, y, *group)
+            elif level[y][x] == 'R':
+                Tile('dirtr', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'q':
+                Tile('dirtq', x, y, *group)
+            elif level[y][x] == 'Q':
+                Tile('dirtq', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'w':
+                Tile('dirtw', x, y, *group)
+            elif level[y][x] == 'W':
+                Tile('dirtw', x, y, *group, is_touchable=False)
+            elif level[y][x] == 'e':
+                Tile('dirte', x, y, *group)
+            elif level[y][x] == 'E':
+                Tile('dirte', x, y, *group, is_touchable=False)
+            elif level[y][x] == 't':
+                Tile('dirtt', x, y, *group)
+            elif level[y][x] == 'T':
+                Tile('dirtt', x, y, *group, is_touchable=False)
+
     tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры
     # вернем размеры поля и оринтеровочный Tile

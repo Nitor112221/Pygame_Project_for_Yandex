@@ -9,3 +9,21 @@
 8 - disappearing_block/disappearing_block_2.png осязаемый
 9 - disappearing_block/disappearing_block_3.png осязаемый
 s - spike/spike_classic.png
+d - dirt/dirt.png осязаемый
+D - dirt/dirt.png не осязаемый
+u - dirt/dirt_up.png осязаемый
+U - dirt/dirt_up.png не осязаемый
+h - dirt/dirt_down.png осязаемый
+H - dirt/dirt_down.png не осязаемый
+l - dirt/dirt_left.png осязаемый
+L - dirt/dirt_left.png не осязаемый
+r - dirt/dirt_right.png осязаемый
+R - dirt/dirt_right.png не осязаемый
+q - dirt/dirt_up_left.png осязаемый
+Q - dirt/dirt_up_left.png не осязаемый
+w - dirt/dirt_down_left.png осязаемый
+W - dirt/dirt_down_left.png не осязаемый
+e - dirt/dirt_up_right.png осязаемый
+E - dirt/dirt_up_right.png не осязаемый
+t - dirt/dirt_down_right.png осязаемый
+T - dirt/dirt_down_right.png не осязаемый
