@@ -1,6 +1,9 @@
 # загружаем нужные библиотеки и модули
 import pygame
 from scripts.scenes.menu import menu_scene
+from scripts.scenes.WorldMap_scene import world_map_scene
+from scripts.scenes.game_scene import game_scene
+
 import scripts.tools as tools
 
 # проводим инициализацию pygame
@@ -31,6 +34,10 @@ switch_scene(menu_scene)
 while current_scene is not None:
     if current_scene == 'menu_scene':
         switch_scene(menu_scene)
+    elif current_scene == 'world_map':
+        switch_scene(world_map_scene)
+    elif current_scene == 'game_scene':
+        switch_scene(game_scene)
     current_scene(screen, virtual_surface, switch_scene, settings)
 
 pygame.quit()

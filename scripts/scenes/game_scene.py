@@ -45,6 +45,13 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             if event.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if dead_scene is not None:
+                    result = dead_scene.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface),
+                                               switch_scene)
+                    if result is not None:
+                        running = False
+
             if is_activity:
                 player.handler_event(event)
 
@@ -84,11 +91,6 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
 
         virtual_surface.blit(heal_bar, (5, 5))
         if dead_scene is not None:
-            result = dead_scene.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface), switch_scene)
-            if result is not None:
-                running = False
-            if result == 'game':
-                switch_scene(game_scene)
             dead_scene.draw()
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())

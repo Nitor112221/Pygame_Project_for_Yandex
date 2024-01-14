@@ -1,7 +1,5 @@
 import pygame
 from data.language import russian, english
-from scripts.scenes.WorldMap_scene import world_map_scene
-from scripts.scenes.menu import menu_scene
 
 
 class Button(pygame.sprite.Sprite):
@@ -53,12 +51,13 @@ class DeadScreen:
                 self.surface.get_height() * 0.2 <= mos_pos[1] < self.surface.get_height() * 0.8:
             if self.button_map.rect.collidepoint(mos_pos[0] - self.surface.get_width() * 0.2,
                                                  mos_pos[1] - self.surface.get_height() * 0.2):
-                switch_scene(world_map_scene)
+                switch_scene('world_map')
                 return 'YES'
             elif self.button_menu.rect.collidepoint(mos_pos[0] - self.surface.get_width() * 0.2,
                                                     mos_pos[1] - self.surface.get_height() * 0.2):
-                switch_scene(menu_scene)
+                switch_scene('menu_scene')
                 return 'YES'
             elif self.button_repeat.rect.collidepoint(mos_pos[0] - self.surface.get_width() * 0.2,
                                                       mos_pos[1] - self.surface.get_height() * 0.2):
-                return 'game'
+                switch_scene('game_scene')
+                return 'YES'
