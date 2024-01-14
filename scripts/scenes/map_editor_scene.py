@@ -232,6 +232,7 @@ class EditorScene:
         self.run()
 
     def run(self):
+        # Запускаем основной цикл
         running = True
         while running:
 
