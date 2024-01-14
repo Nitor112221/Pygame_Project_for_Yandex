@@ -50,8 +50,7 @@ def tile_init():
         'platform_vertical': load_image('platform/platform_vertical.png'),
         'disappearing_block1': load_image('disappearing_block/disappearing_block_1.png', -2),
         'disappearing_block2': load_image('disappearing_block/disappearing_block_2.png', -2),
-        'disappearing_block3': load_image('disappearing_block/disappearing_block_3.png', -2),
-        'spike': load_image('spike/spike_classic.png')
+        'disappearing_block3': load_image('disappearing_block/disappearing_block_3.png', -2)
     }
 
     tile_width = tile_height = 8  # размеры 1 тайла
@@ -84,7 +83,7 @@ class Tile(pygame.sprite.Sprite):
     def update(self, player):
         if 'disappearing_block' in self.tile_type:
             if player.rect.move(0, 2).colliderect(self.rect) and not self.disappearing_time:
-                self.disappearing_time = time.time() + 0.6
+                self.disappearing_time = time.time() + 1.5
             if self.disappearing_time is not None and time.time() >= self.disappearing_time:
                 self.image = self.dotted_line.copy()
                 self.is_touchable = False
@@ -109,6 +108,13 @@ def load_default_options():
             key, value = line.strip().split()
             default_options[key] = value
     return default_options
+
+
+def is_file_exists(filename):
+    if os.path.exists(filename):
+        return True
+    else:
+        return False
 
 
 def load_user_options():
@@ -141,16 +147,14 @@ def save_user_options(user_options):
 def load_level(filename):
     filename = "data/levels/" + filename
     # читаем уровень, убирая символы перевода строки
-    if os.path.isfile(filename):
-        with open(filename, 'r') as mapFile:
-            level_map = [line.strip() for line in mapFile]
+    with open(filename, 'r') as mapFile:
+        level_map = [line.strip() for line in mapFile]
 
-        # и подсчитываем максимальную длину
-        max_width = max(map(len, level_map))
+    # и подсчитываем максимальную длину
+    max_width = max(map(len, level_map))
 
-        # дополняем каждую строку пустыми клетками ('.')
-        return list(map(lambda x: x.ljust(max_width, '.'), level_map))
-    print('Файл уровеня не найден')
+    # дополняем каждую строку пустыми клетками ('.')
+    return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 
 def generate_level(level, group):
@@ -177,8 +181,6 @@ def generate_level(level, group):
                 Tile('disappearing_block2', x, y, *group)
             elif level[y][x] == '9':
                 Tile('disappearing_block3', x, y, *group)
-            elif level[y][x] == 's':
-                Tile('spike', x, y, *group, is_touchable=False)
     tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры
     # вернем размеры поля и оринтеровочный Tile
