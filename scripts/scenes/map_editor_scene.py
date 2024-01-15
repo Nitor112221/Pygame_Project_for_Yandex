@@ -211,7 +211,7 @@ class Board:
                     # Добавляем координаты последнего добавленного спрайта
                     push_eleme_to_stack = [(self.coordinate_cell[i][j][0],
                                              self.coordinate_cell[i][j][1]), (i, j)]
-                    if push_eleme_to_stack not in self.stack_action:
+                    if push_eleme_to_stack not in self.stack_action and current_tile is not None:
                         self.stack_action.append(push_eleme_to_stack)
 
                     if current_tile is not None:
