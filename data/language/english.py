@@ -10,5 +10,6 @@ eng = {'Play': 'Play',
        'Map': 'Map',
        'Repeat': 'Repeat',
        'Menu': 'Menu',
-       'Сontinue': 'Continue'
+       'Сontinue': 'Continue',
+       'Music': 'Music'
        }

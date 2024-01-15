@@ -1,4 +1,5 @@
 Language Русский
+Music On
 Upward W
 Left A
 Right D

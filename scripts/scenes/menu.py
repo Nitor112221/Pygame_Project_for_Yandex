@@ -14,6 +14,25 @@ pygame.init()
 font = pygame.font.SysFont('Comic Sans MS', 72)  # шрифт для текста меню
 
 
+class ButtonMusic(pygame.sprite.Sprite):
+    def __init__(self, pos_x: int, pos_y: int, settings: dict):
+        super().__init__()
+        self.music = [tools.load_image('music/music_off.png'),
+                      tools.load_image('music/music_on.png')]
+        self.image = self.music[1] if settings['Music'] == 'On' else self.music[0]
+        self.rect = self.image.get_rect().move(pos_x, pos_y)
+        self.settings = settings
+
+    def update(self, mos_pos: tuple[int, int]):
+        if self.rect.collidepoint(mos_pos):
+            self.settings['Music'] = 'On' if self.settings['Music'] == 'Off' else 'Off'
+            self.image = self.music[1] if self.settings['Music'] == 'On' else self.music[0]
+            tools.save_user_options(self.settings)
+
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, (self.rect.x, self.rect.y))
+
+
 class Menu:  # класс отвечающий за кнопки в меню
     def __init__(self):
         self.option_surflaces: list[str] = list()  # список с поверхностями текста
@@ -89,6 +108,9 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     extra_scene = None  # переменная хранящая текущую доп сцену (с выбором языка или гайдом по управлению)
     menu = Menu()  # создание меню
     running = True
+    music_btn = ButtonMusic(int(virtual_surface.get_width() - virtual_surface.get_width() * 0.03 - 32),
+                            int(virtual_surface.get_height() * 0.06 - 16),
+                            settings)
 
     def open_language_scene() -> None:  # функция открывающая окно выбора языка и блокирующая меню
         nonlocal extra_scene, menu, virtual_surface
@@ -136,6 +158,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                     # если метод вернул Exit - закрываем игру
                     running = False
                     switch_scene(None)
+                music_btn.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface))
             if extra_scene is not None:
                 if extra_scene.handle_event(event, virtual_surface, screen) == 'Close':
                     # если метод вернул Close - закрываем доп окно и востанавливаем функционал меню
@@ -149,8 +172,10 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         if extra_scene is not None:
             extra_scene.draw(virtual_surface)
 
+        music_btn.draw(virtual_surface)
+
         # отрисовываем сцену на экране
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
-        global_variable.increase_volume()
+        global_variable.increase_volume(settings)
         pygame.display.flip()
