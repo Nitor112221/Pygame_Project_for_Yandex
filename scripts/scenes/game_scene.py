@@ -28,14 +28,12 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     is_pause = False
     pause_scene = None
     # загрузка 1 лвл, создание игрока и базового перемещения камеры
-    level_x, level_y, orientation_tile, player_pos = tools.generate_level(tools.load_level(global_variable.current_level),
-                                                              (all_sprites, tiles_group))
+    level_x, level_y, orientation_tile, player_pos, goblins = tools.generate_level(
+        tools.load_level(global_variable.current_level),
+        (all_sprites, tiles_group))
     player = BaseHero(player_pos[0], player_pos[1], settings, all_sprites, player_group)
-    with open('data/levels/' + global_variable.current_level + '_enemy', 'r') as file:
-        for coords in file.readline().split(','):
-            coords = coords.replace('(', '').replace(')', '')
-            coords = coords.split(';')
-            Goblin(int(coords[0]), int(coords[1]), all_sprites, enemy)
+    for coords in goblins:
+        Goblin(int(coords[0]), int(coords[1]), all_sprites, enemy)
     camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
 
     heal_bar = pygame.Surface((100, 15))

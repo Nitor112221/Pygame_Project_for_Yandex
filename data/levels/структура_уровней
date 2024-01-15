@@ -28,3 +28,4 @@ E - dirt/dirt_up_right.png не осязаемый
 t - dirt/dirt_down_right.png осязаемый
 T - dirt/dirt_down_right.png не осязаемый
 @ - координаты персонажа
+g - координаты гоблинов
