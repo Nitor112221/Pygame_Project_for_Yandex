@@ -11,6 +11,7 @@ from scripts.scenes.pause_scene import PauseScene
 
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
     # создаём новую виртуальную поверхность размерами 48 на 24 игровых тайла
+    pygame.mixer.music.stop()
     virtual_surface = pygame.Surface((384, 192))
 
     # ограничение по фпс
@@ -63,6 +64,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                         pause_scene = None
 
                     if result == 'map':
+                        global_variable.is_music_play = False
                         running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 is_pause = not is_pause

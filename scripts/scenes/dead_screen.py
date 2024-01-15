@@ -1,4 +1,6 @@
 import pygame
+
+import global_variable
 from data.language import russian, english
 
 
@@ -52,10 +54,12 @@ class DeadScreen:
             if self.button_map.rect.collidepoint(mos_pos[0] - self.surface.get_width() * 0.2,
                                                  mos_pos[1] - self.surface.get_height() * 0.2):
                 switch_scene('world_map')
+                global_variable.is_music_play = False
                 return 'YES'
             elif self.button_menu.rect.collidepoint(mos_pos[0] - self.surface.get_width() * 0.2,
                                                     mos_pos[1] - self.surface.get_height() * 0.2):
                 switch_scene('menu_scene')
+                global_variable.is_music_play = False
                 return 'YES'
             elif self.button_repeat.rect.collidepoint(mos_pos[0] - self.surface.get_width() * 0.2,
                                                       mos_pos[1] - self.surface.get_height() * 0.2):
