@@ -164,6 +164,7 @@ def load_level(filename):
 
 def generate_level(level, group):
     x, y = None, None  # размеры карты
+    player_coords = None
 
     for y in range(len(level)):
         for x in range(len(level[y])):
@@ -224,11 +225,13 @@ def generate_level(level, group):
                 Tile('dirtt', x, y, *group)
             elif level[y][x] == 'T':
                 Tile('dirtt', x, y, *group, is_touchable=False)
+            elif level[y][x] == '@':
+                player_coords = (x, y)
 
     tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры
     # вернем размеры поля и оринтеровочный Tile
-    return x, y, tile
+    return x, y, tile, player_coords
 
 
 def hover(mos_pos: tuple[int, int], screen: pygame.Surface, virtual_surface: pygame.Surface) -> tuple[int, int]:

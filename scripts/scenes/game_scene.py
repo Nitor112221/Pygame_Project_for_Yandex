@@ -28,22 +28,25 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     is_pause = False
     pause_scene = None
     # загрузка 1 лвл, создание игрока и базового перемещения камеры
-    level_x, level_y, orientation_tile = tools.generate_level(tools.load_level(global_variable.current_level),
+    level_x, level_y, orientation_tile, player_pos = tools.generate_level(tools.load_level(global_variable.current_level),
                                                               (all_sprites, tiles_group))
-    player = BaseHero(24, 1, settings, all_sprites, player_group)
+    player = BaseHero(player_pos[0], player_pos[1], settings, all_sprites, player_group)
     with open('data/levels/' + global_variable.current_level + '_enemy', 'r') as file:
         for coords in file.readline().split(','):
             coords = coords.replace('(', '').replace(')', '')
             coords = coords.split(';')
             Goblin(int(coords[0]), int(coords[1]), all_sprites, enemy)
     camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
+
     heal_bar = pygame.Surface((100, 15))
     heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
     heal_bar.set_colorkey((35, 64, 128))
+
     running = True
     while running:
         heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
         heal_bar.set_colorkey((35, 64, 128))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -60,6 +63,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                     if result == 'continue':
                         is_pause = False
                         pause_scene = None
+
                     if result == 'map':
                         running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -68,6 +72,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                     pause_scene = PauseScene(virtual_surface, settings)
                 else:
                     pause_scene = None
+
             if is_activity and not is_pause:
                 player.handler_event(event)
 
