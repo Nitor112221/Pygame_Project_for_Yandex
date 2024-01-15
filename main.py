@@ -28,6 +28,7 @@ current_scene = None
 pygame.mixer.music.load('data/music_and_sound/background_music_for_menu.mp3')
 pygame.mixer.music.play(-1)
 global_variable.is_music_play = True
+pygame.mixer.music.set_volume(global_variable.volume_sound_background)
 
 
 def switch_scene(scene):

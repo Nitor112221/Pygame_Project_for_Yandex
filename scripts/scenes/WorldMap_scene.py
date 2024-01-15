@@ -141,4 +141,5 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
         pygame.display.flip()
+        global_variable.increase_volume()
         clock.tick(fps)

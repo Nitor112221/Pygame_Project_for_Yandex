@@ -1,4 +1,6 @@
 import pygame
+
+import global_variable
 import scripts.tools as tools
 from scripts.scenes.language_menu import LanguageScene
 from scripts.scenes.control_menu import ControlScene
@@ -150,4 +152,5 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         # отрисовываем сцену на экране
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))
+        global_variable.increase_volume()
         pygame.display.flip()
