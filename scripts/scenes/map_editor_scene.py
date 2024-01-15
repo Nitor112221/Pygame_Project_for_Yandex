@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 import scripts.tools as tools
 from data.language import russian, english
 
@@ -55,6 +56,13 @@ class Tile:
             current_index += 1
         return None
 
+    def return_sprite(self, index):
+        count = 0
+        for sprite in self.tile_group:
+            if index == count:
+                return sprite
+            count += 1
+
     # Добавьте метод для изменения типа тайла
     def change_tile_type(self):
         pass
@@ -62,7 +70,7 @@ class Tile:
 
 
 class Board:
-    def __init__(self, surface, filename):
+    def __init__(self, surface, filename, last_coordinate):
         self.surface = surface
         self.width = surface.get_width()
         self.height = surface.get_height()
@@ -73,6 +81,7 @@ class Board:
         self.cell_size = 16
         self.board = [['.'] * 48 for _ in range(24)]
         self.coordinate_cell = []
+        self.last_coordinate = last_coordinate
         self.stack_action = []  # тут храним стек всех добавленных координат на начало сцены
 
         if tools.is_file_exists(filename):
@@ -131,6 +140,25 @@ class Board:
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
+        color = pygame.Color(255, 0, 0, 255)
+        for i in range(len(self.coordinate_cell)):
+            for j in range(len(self.coordinate_cell[i])):
+                try:
+                    if self.coordinate_cell[i][j][0] < self.last_coordinate[0] < \
+                            (self.coordinate_cell[i][j][0] + self.cell_size) and \
+                            self.coordinate_cell[i][j][1] < self.last_coordinate[1] < \
+                            (self.coordinate_cell[i][j][1] + self.cell_size) and \
+                            self.last_coordinate[1] < self.height - 58:
+                        self.draw_rect(self.surface,
+                                       color,
+                                       self.coordinate_cell[i][j][0],
+                                       self.coordinate_cell[i][j][1],
+                                       self.cell_size,
+                                       self.cell_size,
+                                       2)
+                except TypeError:
+                    pass
+
     def back_render(self):
         if len(self.stack_action) != 0:
             cur_elem_stack = self.stack_action[-1]
@@ -151,7 +179,19 @@ class Board:
                 self.board[col][row] = '.'
         self.draw()
 
-    def draw_rect(self, surface, color, coor_x, coor_y, size_x, size_y, gauge):
+    def delete_tile(self, coor):
+        for col in range(len(self.coordinate_cell)):
+            for row in range(len(self.coordinate_cell[col])):
+                if self.coordinate_cell[col][row][0] < coor[0] < \
+                        (self.coordinate_cell[col][row][0] + self.cell_size) and \
+                        self.coordinate_cell[col][row][1] < coor[1] < \
+                        (self.coordinate_cell[col][row][1] + self.cell_size) and \
+                        coor[1] < self.height - 58:
+                    self.board[col][row] = '.'
+                    print(1)
+        self.draw()
+
+    def draw_rect(self, surface, color, coor_x, coor_y, size_x, size_y, gauge=0):
         pygame.draw.rect(surface,
                          color,
                          (coor_x,
@@ -169,8 +209,10 @@ class Board:
                         coor[1] < self.height - 58:
 
                     # Добавляем координаты последнего добавленного спрайта
-                    self.stack_action.append([(self.coordinate_cell[i][j][0],
-                                             self.coordinate_cell[i][j][1]), (i, j)])
+                    push_eleme_to_stack = [(self.coordinate_cell[i][j][0],
+                                             self.coordinate_cell[i][j][1]), (i, j)]
+                    if push_eleme_to_stack not in self.stack_action:
+                        self.stack_action.append(push_eleme_to_stack)
 
                     if current_tile is not None:
                         self.board[i][j] = id_
@@ -223,9 +265,10 @@ class EditorScene:
         self.id_ = None
         self.fps = 60
         self.clock = pygame.time.Clock()
+        self.last_coordinate = None
 
         self.filename = 'level_2'
-        self.board = Board(self.screen, self.filename)
+        self.board = Board(self.screen, self.filename, self.last_coordinate)
         self.tile = Tile(self.screen)
         self.button = Button(self.screen)
 
@@ -253,6 +296,9 @@ class EditorScene:
                     running = False
                     self.switch_scene(None)
 
+                if event.type == pygame.MOUSEMOTION:
+                    self.board.last_coordinate = event.pos
+
                 mouse_pressed = pygame.mouse.get_pressed()
                 if mouse_pressed[0]:  # 0 соответствует левой кнопке мыши
                     # Меняем выбранный тайл на новый, если нажали на него
@@ -260,6 +306,7 @@ class EditorScene:
                     if return_click_on_tile is not None:
                         self.current_tile = return_click_on_tile[0]
                         self.id_ = return_click_on_tile[1]
+                    print(self.current_tile, self.id_)
                     self.board.chek_clicked_on_board(event.pos, self.current_tile, self.id_)
 
                     # Если нажали на кнопку отмены действия и действия были накоплены - отменяем его
@@ -267,9 +314,13 @@ class EditorScene:
                     if return_click_on_btn is not None:
                         self.board.back_render()
 
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                    self.board.delete_tile(event.pos)
+
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                     # Если колесико вверх - увеличиваем размер сторон ячеек доски
                     self.board.cell_size += 1
+
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
                     # Если колесико вниз - увеличиваем размер сторон ячеек доски до миниального размера = 8
                     if self.board.cell_size > 8:
@@ -278,8 +329,45 @@ class EditorScene:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         self.save_board_file(self.filename)
-                    elif event.key == pygame.K_CAPSLOCK:
+                    elif event.key == pygame.K_BACKSPACE:
                         self.board.clear_board()
+                    elif event.key == pygame.K_TAB:
+                        self.current_tile = None
+
+                    # elif event.key == pygame.K_1:
+                    #     self.current_tile = 0
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_2:
+                    #     self.current_tile = 1
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_3:
+                    #     self.current_tile = 2
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_4:
+                    #     self.current_tile = 3
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_5:
+                    #     self.current_tile = 4
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_6:
+                    #     self.current_tile = 5
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_7:
+                    #     self.current_tile = 6
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_8:
+                    #     self.current_tile = 7
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_9:
+                    #     self.current_tile = 8
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+                    # elif event.key == pygame.K_0:
+                    #     self.current_tile = 9
+                    #     self.id_ = self.tile.return_sprite(self.current_tile)
+
+                    elif event.key == K_z and pygame.key.get_mods() & KMOD_CTRL:  # Проверяем, были ли нажаты Ctrl + Z
+                        # Если нажали на кнопку отмены действия и действия были накоплены - отменяем его
+                        self.board.back_render()
 
             self.render()
             self.board.draw()
