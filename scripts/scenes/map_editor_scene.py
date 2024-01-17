@@ -22,6 +22,7 @@ class Tile:
         self.current_index = 0
         self.shift_x = 0
         self.last_left_coorx = 0
+        self.last_right_coorx = self.screen_width
 
         self.tile_images = {
             '1.': tools.load_image('platform/platform.png'),
@@ -55,6 +56,7 @@ class Tile:
             if current_index == 0:
                 self.last_left_coorx = tile.rect.x
             current_index += 1
+            self.last_right_coorx = tile.rect.x
 
         self.tile_group.draw(self.screen)
 
@@ -98,6 +100,7 @@ class Board:
         self.board = [['.'] * 48 for _ in range(24)]
         self.coordinate_cell = []
         self.last_coordinate = last_coordinate
+        self.last_coor_board = (0, 0)
         self.stack_action = []  # тут храним стек всех добавленных координат на начало сцены
 
         if tools.is_file_exists(filename):
@@ -172,6 +175,9 @@ class Board:
                                        self.cell_size,
                                        self.cell_size,
                                        2)
+
+                        self.last_coor_board = (i, j)
+
                 except TypeError:
                     pass
 
@@ -214,23 +220,34 @@ class Board:
                           size_x,
                           size_y), gauge)
 
-    def chek_clicked_on_board(self, coor, current_tile, current_index_tile):
+    def chek_clicked_on_board(self, coor, current_tile=None, current_index_tile=None):
         for i in range(len(self.coordinate_cell)):
             for j in range(len(self.coordinate_cell[i])):
-                if self.coordinate_cell[i][j][0] < coor[0] < \
-                        (self.coordinate_cell[i][j][0] + self.cell_size) and \
-                        self.coordinate_cell[i][j][1] < coor[1] < \
-                        (self.coordinate_cell[i][j][1] + self.cell_size) and \
-                        coor[1] < self.height - 58:
+                # Если вызвали метод для отрисовки тайла
+                if current_tile is not None and current_index_tile is not None:
+                    if self.coordinate_cell[i][j][0] < coor[0] < \
+                            (self.coordinate_cell[i][j][0] + self.cell_size) and \
+                            self.coordinate_cell[i][j][1] < coor[1] < \
+                            (self.coordinate_cell[i][j][1] + self.cell_size) and \
+                            coor[1] < self.height - 58:
 
-                    # Добавляем координаты последнего добавленного спрайта
-                    push_eleme_to_stack = [(self.coordinate_cell[i][j][0],
-                                             self.coordinate_cell[i][j][1]), (i, j)]
-                    if push_eleme_to_stack not in self.stack_action and current_tile is not None:
-                        self.stack_action.append(push_eleme_to_stack)
+                            # Добавляем координаты последнего добавленного спрайта
+                            push_eleme_to_stack = [(self.coordinate_cell[i][j][0],
+                                                     self.coordinate_cell[i][j][1]), (i, j)]
+                            if push_eleme_to_stack not in self.stack_action and current_tile is not None:
+                                self.stack_action.append(push_eleme_to_stack)
 
-                    if current_tile is not None:
-                        self.board[i][j] = current_index_tile
+                            if current_tile is not None:
+                                self.board[i][j] = current_index_tile
+
+                # Если нужно просто проверить нахождении мыши внутри доски
+                else:
+                    if self.coordinate_cell[i][j][0] <= coor[0] <= \
+                            (self.coordinate_cell[i][j][0] + self.cell_size) and \
+                            self.coordinate_cell[i][j][1] <= coor[1] <= \
+                            (self.coordinate_cell[i][j][1] + self.cell_size) and \
+                            coor[1] <= self.height - 58:
+                        return True
 
                     # print(self.coordinate_cell[i][j][0],
                     #       self.coordinate_cell[i][j][1])
@@ -271,6 +288,23 @@ class Button:
         return None
 
 
+class Text:
+    def __init__(self, screen):
+        self.screen = screen
+        self.x = 10
+        self.y = 10
+        self.pos = (self.x, self.y)
+        self.font = pygame.font.Font(None, 25)
+
+    def render(self, coor, focus):
+        if focus:
+            text = f'{coor[0]};{coor[1]}'
+        else:
+            text = f'Not focused'
+        text_surface = self.font.render(text, True, (255, 255, 255))
+        self.screen.blit(text_surface, self.pos)
+
+
 # Главный класс сцены редактора уровней
 class EditorScene:
     def __init__(self, screen, virtual_surface: pygame.Surface, switch_scene, settings):
@@ -286,17 +320,23 @@ class EditorScene:
         self.current_tile = None
         # Индекс текущего выбранного тайла для отрисовки
         self.current_index_tile = None
-        # Последнии координаты мыши
+        # Последнии координаты мыши, поля и переменная нахождения мыши в области поля
         self.last_coordinate = None
+        self.last_coor_board = (0, 0)
+        self.focus_board = None
         # Имя файла, для сохранения уровня
         self.filename = 'level_2'
         # Инстансы классов доски, тайла, кнопки
         self.board = Board(self.screen, self.filename, self.last_coordinate)
         self.tile = Tile(self.screen)
         self.button = Button(self.screen)
+        self.text = Text(self.screen)
 
         # Запускаем обработку пользовательских действий
         self.run()
+
+    def focused_board(self):
+        self.focus_board = self.board.chek_clicked_on_board(self.last_coordinate)
 
     def run(self):
         # Определение клавиш для разных операционных систем
@@ -320,20 +360,31 @@ class EditorScene:
                 self.switch_scene('menu_scene')
             if keys[pygame.K_LEFT]:
                 if self.last_coordinate is not None:
-                    if self.last_coordinate[1] < self.screen.get_height() - self.tile.cell_size + self.tile.bottom:
+                    if self.last_coordinate[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                         self.board.left += 10
                     else:
-                        self.tile.shift_x -= 10
+                        if self.tile.last_right_coorx - self.tile.left > 0:
+                            self.tile.shift_x -= 10
+                self.focused_board()
+
             if keys[pygame.K_RIGHT]:
                 if self.last_coordinate is not None:
-                    if self.last_coordinate[1] < self.screen.get_height() - self.tile.cell_size + self.tile.bottom:
+                    if self.last_coordinate[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                         self.board.left -= 10
                     else:
-                        self.tile.shift_x += 10
+                        if self.tile.last_left_coorx + self.tile.cell_size + self.tile.left \
+                                < self.screen.get_width():
+                            self.tile.shift_x += 10
+                self.focused_board()
+
             if keys[pygame.K_DOWN]:
                 self.board.top -= 10
+                self.focused_board()
+
             if keys[pygame.K_UP]:
                 self.board.top += 10
+                self.focused_board()
+
                 # Проверяем, были ли нажаты Ctrl + Z
             if keys[pygame.K_z] and (keys[pygame.K_LCTRL] or keys[pygame.K_RCTRL]):
                 # Если нажали на кнопку отмены действия и действия были накоплены - отменяем его (удаляем блок)
@@ -349,6 +400,7 @@ class EditorScene:
                 elif event.type == pygame.MOUSEMOTION:
                     self.last_coordinate = event.pos
                     self.board.last_coordinate = self.last_coordinate
+                    self.focus_board = self.board.chek_clicked_on_board(self.last_coordinate)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == key_to_press:
                         self.save_board_file(self.filename)
@@ -356,6 +408,7 @@ class EditorScene:
                         self.board.clear_board()
                     elif event.key == pygame.K_TAB:
                         self.current_tile = None
+                self.last_coor_board = self.board.last_coor_board
 
                 # elif event.key == pygame.K_1:
                 #    self.current_tile = 0
@@ -411,6 +464,7 @@ class EditorScene:
                         if event.pos[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                             # Если колесико вверх - увеличиваем размер сторон ячеек доски
                             self.board.cell_size += 1
+                            self.focused_board()
                         else:
                             # Проверка на нахождения в видимой зоне
                             if self.tile.last_left_coorx + self.tile.cell_size + self.tile.left \
@@ -418,13 +472,14 @@ class EditorScene:
                                 self.tile.shift_x += 10
 
                     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
-                        if event.pos[1] < self.screen.get_height() - self.tile.cell_size + self.tile.bottom:
+                        if event.pos[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                             # Если колесико вниз - увеличиваем размер сторон ячеек доски до миниального размера = 8
                             if self.board.cell_size > 8:
                                 self.board.cell_size -= 1
+                            self.focused_board()
                         else:
                             # Проверка на нахождения в видимой зоне
-                            if self.tile.last_left_coorx - self.tile.left > 0:
+                            if self.tile.last_right_coorx - self.tile.left > 0:
                                 self.tile.shift_x -= 10
 
                 # Делаем защиту от уязвимости (сборки координат при нажатии кнопок на клавиатуре)
@@ -436,6 +491,8 @@ class EditorScene:
             self.board.render()
             self.tile.render()
             self.button.render()
+            self.text.render(self.last_coor_board, self.focus_board)
+
             pygame.display.flip()
             self.clock.tick(self.FPS)
 
