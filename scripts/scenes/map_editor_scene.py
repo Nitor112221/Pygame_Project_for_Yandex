@@ -20,6 +20,8 @@ class Tile:
         self.cell_size = 40
         self.alpha = 128
         self.current_index = 0
+        self.shift_x = 0
+        self.last_left_coorx = 0
 
         self.tile_images = {
             '1.': tools.load_image('platform/platform.png'),
@@ -36,6 +38,8 @@ class Tile:
 
     # Метод отрисовки всех тайлов на экране
     def render(self):
+        # Необхлодимо очистить группу, чтобы внести спрайы с новыми координатами и отрисовать их
+        self.tile_group = pygame.sprite.Group()
         current_index = 0
         for key, value in self.tile_images.items():
             tile = pygame.sprite.Sprite(self.tile_group)
@@ -46,13 +50,15 @@ class Tile:
 
             tile.image = scaled_image
             tile.rect = tile.image.get_rect()
-            tile.rect.x, tile.rect.y = current_index * self.cell_size + current_index * self.left + 10, \
+            tile.rect.x, tile.rect.y = current_index * self.cell_size + current_index * self.left + 10 + self.shift_x, \
                 self.screen_height - self.cell_size - self.bottom
+            if current_index == 0:
+                self.last_left_coorx = tile.rect.x
             current_index += 1
 
         self.tile_group.draw(self.screen)
 
-    # Методлд проверки нажатия на тайл
+    # Метод для проверки нажатия на тайл
     def chek_clicked(self, coords):
         current_index_tile = 0
         for sprite in self.tile_group:
@@ -68,13 +74,6 @@ class Tile:
                 return sprite, current_index_tile
             current_index_tile += 1
         return None
-
-    def move_tile(self, val="+"):
-        for tile in self.tile_group:
-            if val == '+':
-                tile.rect = tile.rect.move(+10, 0)
-            elif val == '-':
-                tile.rect = tile.rect.move(-10, 0)
 
     # Метод возврата тайла по текущему индексу для дальнейших действий
     def return_sprite(self, index):
@@ -300,7 +299,6 @@ class EditorScene:
         self.run()
 
     def run(self):
-
         # Определение клавиш для разных операционных систем
         if sys.platform.startswith('win'):
             # Для Windows
@@ -321,9 +319,17 @@ class EditorScene:
                 running = False
                 self.switch_scene('menu_scene')
             if keys[pygame.K_LEFT]:
-                self.board.left += 10
+                if self.last_coordinate is not None:
+                    if self.last_coordinate[1] < self.screen.get_height() - self.tile.cell_size + self.tile.bottom:
+                        self.board.left += 10
+                    else:
+                        self.tile.shift_x -= 10
             if keys[pygame.K_RIGHT]:
-                self.board.left -= 10
+                if self.last_coordinate is not None:
+                    if self.last_coordinate[1] < self.screen.get_height() - self.tile.cell_size + self.tile.bottom:
+                        self.board.left -= 10
+                    else:
+                        self.tile.shift_x += 10
             if keys[pygame.K_DOWN]:
                 self.board.top -= 10
             if keys[pygame.K_UP]:
@@ -341,7 +347,8 @@ class EditorScene:
                     running = False
                     self.switch_scene(None)
                 elif event.type == pygame.MOUSEMOTION:
-                    self.board.last_coordinate = event.pos
+                    self.last_coordinate = event.pos
+                    self.board.last_coordinate = self.last_coordinate
                 elif event.type == pygame.KEYDOWN:
                     if event.key == key_to_press:
                         self.save_board_file(self.filename)
@@ -349,6 +356,37 @@ class EditorScene:
                         self.board.clear_board()
                     elif event.key == pygame.K_TAB:
                         self.current_tile = None
+
+                # elif event.key == pygame.K_1:
+                #    self.current_tile = 0
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_2:
+                #     self.current_tile = 1
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_3:
+                #     self.current_tile = 2
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_4:
+                #     self.current_tile = 3
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_5:
+                #     self.current_tile = 4
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_6:
+                #     self.current_tile = 5
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_7:
+                #     self.current_tile = 6
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_8:
+                #     self.current_tile = 7
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_9:
+                #     self.current_tile = 8
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                # elif event.key == pygame.K_0:
+                #     self.current_tile = 9
+                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
 
                 # Обработка нажатий на мышь
                 mouse_pressed = pygame.mouse.get_pressed()
@@ -370,11 +408,14 @@ class EditorScene:
                         self.board.delete_tile(event.pos)
 
                     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
-                        if event.pos[1] < self.screen.get_height() - self.tile.cell_size + self.tile.bottom:
+                        if event.pos[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                             # Если колесико вверх - увеличиваем размер сторон ячеек доски
                             self.board.cell_size += 1
                         else:
-                            self.tile.move_tile('+')
+                            # Проверка на нахождения в видимой зоне
+                            if self.tile.last_left_coorx + self.tile.cell_size + self.tile.left \
+                                    < self.screen.get_width():
+                                self.tile.shift_x += 10
 
                     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
                         if event.pos[1] < self.screen.get_height() - self.tile.cell_size + self.tile.bottom:
@@ -382,42 +423,13 @@ class EditorScene:
                             if self.board.cell_size > 8:
                                 self.board.cell_size -= 1
                         else:
-                            self.tile.move_tile('-')
+                            # Проверка на нахождения в видимой зоне
+                            if self.tile.last_left_coorx - self.tile.left > 0:
+                                self.tile.shift_x -= 10
 
                 # Делаем защиту от уязвимости (сборки координат при нажатии кнопок на клавиатуре)
                 except AttributeError:
                     pass
-
-                    # elif event.key == pygame.K_1:
-                    #     self.current_tile = 0
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_2:
-                    #     self.current_tile = 1
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_3:
-                    #     self.current_tile = 2
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_4:
-                    #     self.current_tile = 3
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_5:
-                    #     self.current_tile = 4
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_6:
-                    #     self.current_tile = 5
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_7:
-                    #     self.current_tile = 6
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_8:
-                    #     self.current_tile = 7
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_9:
-                    #     self.current_tile = 8
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                    # elif event.key == pygame.K_0:
-                    #     self.current_tile = 9
-                    #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
 
             # Отрисовываем все объекты редактора
             self.render()
