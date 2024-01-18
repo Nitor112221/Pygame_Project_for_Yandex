@@ -1,6 +1,6 @@
 eng = {'Play': 'Play',
        'Control': 'Control',
-       'Language': 'Languege',
+       'Language': 'Language',
        'Exit': 'Exit',
        'Upward': 'Up',
        'Left': 'Left',

@@ -18,6 +18,7 @@ tools.save_user_options(settings)
 
 # создаём экран
 screen = pygame.display.set_mode((800, 500), pygame.RESIZABLE)
+pygame.display.set_caption('Зов Героя: Королевский изгнанник')
 
 # экран на котором всё будет рисоватся, а потом оно растянется
 virtual_surface = pygame.Surface((1920, 1080), pygame.SRCALPHA)
