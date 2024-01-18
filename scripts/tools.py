@@ -110,8 +110,17 @@ def load_default_options():
     return default_options
 
 
-def is_file_exists(filename):
-    file_path = 'data/levels/' + filename
+def load_font(font_name):
+    font_path = 'data/fonts/'
+    return font_path + font_name
+    # if is_file_exists(font_name, font_path):
+    #     return font_path + font_name
+    # print(1)
+    # return None
+
+
+def is_file_exists(filename, file_path):
+    file_path = file_path + filename
     if os.path.exists(file_path):
         return True
     return False

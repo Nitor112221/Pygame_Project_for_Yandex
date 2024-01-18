@@ -100,10 +100,11 @@ class Board:
         self.board = [['.'] * 48 for _ in range(24)]
         self.coordinate_cell = []
         self.last_coordinate = last_coordinate
-        self.last_coor_board = (0, 0)
+        self.coor_first_cell = [0, 0]
+        self.last_coor_board = [0, 0]
         self.stack_action = []  # тут храним стек всех добавленных координат на начало сцены
 
-        if tools.is_file_exists(filename):
+        if tools.is_file_exists(filename, 'data/levels/'):
             self.board = tools.load_level(filename)
             new_board = [['.'] * len(self.board[_]) for _ in range(len(self.board))]
             for i in range(len(self.board)):
@@ -129,7 +130,7 @@ class Board:
         self.left = left
         self.cell_size = size
 
-    def render(self):
+    def render(self, current_tile=None):
         coordinate = []
         self.coordinate_cell = []
         for col in range(len(self.board)):
@@ -141,6 +142,8 @@ class Board:
                                self.cell_size,
                                self.cell_size,
                                1)
+                if col == 0 and row == 0:
+                    self.coor_first_cell = [row * self.cell_size + self.left, col * self.cell_size + self.top]
 
                 if self.board[col][row] != '.':
                     surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))
@@ -159,7 +162,10 @@ class Board:
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
-        color = pygame.Color(255, 0, 0, 255)
+        if current_tile is None:
+            color = pygame.Color(255, 0, 0, 255)
+        else:
+            color = pygame.Color(0, 214, 27, 255)
         for i in range(len(self.coordinate_cell)):
             for j in range(len(self.coordinate_cell[i])):
                 try:
@@ -289,19 +295,22 @@ class Button:
 
 
 class Text:
-    def __init__(self, screen):
+    def __init__(self, screen, x, y, font_name=None):
         self.screen = screen
-        self.x = 10
-        self.y = 10
+        self.x = x
+        self.y = y
         self.pos = (self.x, self.y)
-        self.font = pygame.font.Font(None, 25)
+
+        self.color = pygame.Color((255, 255, 255))
+        self.font_name = tools.load_font(font_name)
+        self.font = pygame.font.Font(self.font_name, 15)
 
     def render(self, coor, focus):
         if focus:
             text = f'{coor[0]};{coor[1]}'
         else:
             text = f'Not focused'
-        text_surface = self.font.render(text, True, (255, 255, 255))
+        text_surface = self.font.render(text, True, self.color)
         self.screen.blit(text_surface, self.pos)
 
 
@@ -312,6 +321,8 @@ class EditorScene:
         self.switch_scene = switch_scene
         self.settings = settings
         self.screen = screen
+        self.screen_width = screen.get_width()
+        self.screen_height = screen.get_height()
         self.virtual_surface = pygame.Surface((virtual_surface.get_width() * 0.5, virtual_surface.get_height() * 0.5))
         self.FPS = 60
         self.clock = pygame.time.Clock()
@@ -321,7 +332,7 @@ class EditorScene:
         # Индекс текущего выбранного тайла для отрисовки
         self.current_index_tile = None
         # Последнии координаты мыши, поля и переменная нахождения мыши в области поля
-        self.last_coordinate = None
+        self.last_coordinate = (0, 0)
         self.last_coor_board = (0, 0)
         self.focus_board = None
         # Имя файла, для сохранения уровня
@@ -330,7 +341,9 @@ class EditorScene:
         self.board = Board(self.screen, self.filename, self.last_coordinate)
         self.tile = Tile(self.screen)
         self.button = Button(self.screen)
-        self.text = Text(self.screen)
+        self.text1 = Text(self.screen, 5, 5, 'minecraft_seven_2.ttf')
+        self.text2 = Text(self.screen, 5, 30, 'minecraft_seven_2.ttf')
+        self.list_text = [self.text1, self.text2]
 
         # Запускаем обработку пользовательских действий
         self.run()
@@ -488,10 +501,14 @@ class EditorScene:
 
             # Отрисовываем все объекты редактора
             self.render()
-            self.board.render()
+            self.board.render(self.current_tile)
             self.tile.render()
             self.button.render()
-            self.text.render(self.last_coor_board, self.focus_board)
+            for text_index in range(len(self.list_text)):
+                if text_index != 1:
+                    self.list_text[text_index].render(self.last_coor_board, self.focus_board)
+                else:
+                    self.list_text[text_index].render(self.board.coor_first_cell, True)
 
             pygame.display.flip()
             self.clock.tick(self.FPS)
