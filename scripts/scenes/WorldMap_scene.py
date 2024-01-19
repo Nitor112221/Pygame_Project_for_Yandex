@@ -64,6 +64,13 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
     background = tools.load_image('background.png')
     background = pygame.transform.scale(background, virtual_surface.get_size())
 
+    # установка курсора мыши на свой
+    cursor_img = pygame.transform.scale(tools.load_image('cursor.png'), (60, 60))
+    cursor_group = pygame.sprite.Group()
+    cursor = pygame.sprite.Sprite(cursor_group)
+    cursor.image = cursor_img
+    cursor.rect = cursor.image.get_rect()
+
     dragging = False
     start_pos = (0, 0)
     running = True
@@ -73,6 +80,8 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
             if event.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
+            elif event.type == pygame.MOUSEMOTION:
+                cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
                 start_pos = pygame.mouse.get_pos()
@@ -137,6 +146,8 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
         virtual_surface.blit(scaled_map,
                              (virtual_surface.get_width() // 2 - scaled_map.get_width() // 2 - scroll_x,
                               virtual_surface.get_height() // 2 - scaled_map.get_height() // 2 - scroll_y))
+
+        cursor_group.draw(virtual_surface)
 
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))

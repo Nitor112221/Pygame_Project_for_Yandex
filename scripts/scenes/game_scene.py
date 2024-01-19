@@ -41,6 +41,13 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
     heal_bar.set_colorkey((35, 64, 128))
 
+    # установка курсора мыши на свой
+    cursor_img = pygame.transform.scale(tools.load_image('cursor.png'), (12, 12))
+    cursor_group = pygame.sprite.Group()
+    cursor = pygame.sprite.Sprite(cursor_group)
+    cursor.image = cursor_img
+    cursor.rect = cursor.image.get_rect()
+
     running = True
     while running:
         heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
@@ -50,6 +57,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             if event.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
+            elif event.type == pygame.MOUSEMOTION:
+                cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
             elif event.type == pygame.MOUSEBUTTONUP:
                 if dead_scene is not None:
                     result = dead_scene.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface),
@@ -116,6 +125,9 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             dead_scene.draw()
         if pause_scene is not None and is_pause:
             pause_scene.draw()
+
+        cursor_group.draw(virtual_surface)
+
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))

@@ -137,6 +137,13 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     background = tools.load_image('background.png')
     background = pygame.transform.scale(background, virtual_surface.get_size())
 
+    # установка курсора мыши на свой
+    cursor_img = pygame.transform.scale(tools.load_image('cursor.png'), (60, 60))
+    cursor_group = pygame.sprite.Group()
+    cursor = pygame.sprite.Sprite(cursor_group)
+    cursor.image = cursor_img
+    cursor.rect = cursor.image.get_rect()
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -153,6 +160,10 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                     if menu.select() == 'Exit':  # если функция вернула Exit - закрываем игру
                         running = False
                         switch_scene(None)
+
+            if event.type == pygame.MOUSEMOTION:
+                cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
+
             if event.type == pygame.MOUSEBUTTONDOWN:  # обработка нажатий мыши
                 if menu.check_mouse_event(100, screen, virtual_surface, settings) == 'Exit':
                     # если метод вернул Exit - закрываем игру
@@ -173,6 +184,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             extra_scene.draw(virtual_surface)
 
         music_btn.draw(virtual_surface)
+        cursor_group.draw(virtual_surface)
 
         # отрисовываем сцену на экране
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
