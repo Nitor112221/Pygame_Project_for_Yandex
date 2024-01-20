@@ -34,7 +34,37 @@ class Goblin(Enemy):
                                     tools.load_image('goblin/goblin_idle/idle6.png'),
                                     tools.load_image('goblin/goblin_idle/idle7.png'),
                                     tools.load_image('goblin/goblin_idle/idle8.png')],
+                     'attack_right': [tools.load_image('goblin/goblin_attack/attack1.png'),
+                                      tools.load_image('goblin/goblin_attack/attack2.png'),
+                                      tools.load_image('goblin/goblin_attack/attack3.png'),
+                                      tools.load_image('goblin/goblin_attack/attack4.png'),
+                                      tools.load_image('goblin/goblin_attack/attack5.png'),
+                                      tools.load_image('goblin/goblin_attack/attack6.png'),
+                                      tools.load_image('goblin/goblin_attack/attack7.png'),
+                                      tools.load_image('goblin/goblin_attack/attack8.png'),
+                                      tools.load_image('goblin/goblin_attack/attack9.png'),
+                                      tools.load_image('goblin/goblin_attack/attack10.png'),
+                                      tools.load_image('goblin/goblin_attack/attack11.png')],
+                     'attack_left': [tools.load_image('goblin/goblin_attack/attack1.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack2.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack3.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack4.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack5.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack6.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack7.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack8.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack9.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack10.png', reverse=True),
+                                     tools.load_image('goblin/goblin_attack/attack11.png', reverse=True)],
                      'classic_left': [tools.load_image('goblin/goblin_idle/idle1.png', reverse=True)],
                      'classic_right': [tools.load_image('goblin/goblin_idle/idle1.png')]
                      }
         super().__init__(pos_x, pos_y, animation, animation['idle_right'][0], *gruop)
+        self.attack_cooldown = 1500
+
+    def update(self, player, tile_group):
+        if self.attacking:
+            self.animation_speed = 0.1
+        else:
+            self.animation_speed = 0.15
+        super().update(player, tile_group)

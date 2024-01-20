@@ -22,6 +22,10 @@ class Entity(pygame.sprite.Sprite):
         self.is_stop = True
         # состояние существа (бежит, прыгает, падает и тд)
         self.status: str = 'classic'
+        #  параметры для аткаи
+        self.attacking = False
+        self.attack_time = None
+        self.attack_cooldown = 100
         # направление в которое смотрит существо (left или right)
         self.direction = 'right'
         self.frame_index = 0
@@ -40,6 +44,7 @@ class Entity(pygame.sprite.Sprite):
             self.direction = 'right'
         elif self.x_speed < 0:
             self.direction = 'left'
+        self.cooldowns()
         self.status = self.status.split('_')[0] + '_' + self.direction
         self.get_status()
         self.animate()
@@ -67,19 +72,29 @@ class Entity(pygame.sprite.Sprite):
 
     def get_status(self):
         # idle status
-        if self.x_speed == 0 and self.y_speed == 0 and self.is_grounded:
+        if self.x_speed == 0 and self.y_speed == 0 and self.is_grounded and not self.attacking:
             self.status = 'idle_' + self.direction
 
         # walk status
-        if self.x_speed != 0 and self.y_speed == 0 and self.is_grounded:
+        if self.x_speed != 0 and self.y_speed == 0 and self.is_grounded and not self.attacking:
             self.status = 'walk_' + self.direction
 
         # fall status
         if self.y_speed > 0.5:
             self.status = 'fall_' + self.direction
 
+        if self.attacking:
+            self.status = 'attack_' + self.direction
+
         if self.status is None:
             self.status = 'classic_' + self.direction
+
+    def cooldowns(self):
+        current_time = pygame.time.get_ticks()
+
+        if self.attacking:
+            if current_time - self.attack_time >= self.attack_cooldown:
+                self.attacking = False
 
     def animate(self):
         try:
