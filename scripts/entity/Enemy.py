@@ -17,6 +17,9 @@ class Enemy(Entity):
         super().__init__(image, pos_x, pos_y, animation, *group)
         self.sight_distance = 8 * 15
         self.irascibilis = False
+        self.heal_bar = pygame.Surface((self.rect.width - 8, 4))
+        self.heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
+        self.heal_bar.set_colorkey((35, 64, 128))
 
     def update(self, player, tile_group):
         super().update(tile_group)
@@ -40,4 +43,10 @@ class Enemy(Entity):
     def draw(self, surface: pygame.Surface):
         if self.irascibilis:
             pygame.draw.rect(surface, 'red', self.rect, 1)
+        self.heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
+        self.heal_bar.set_colorkey((35, 64, 128))
+        pygame.draw.rect(self.heal_bar, (193, 0, 0),
+                         pygame.Rect(0, 0, int((self.heal_bar.get_width()) * (self.hp / self.max_hp)),
+                                     self.heal_bar.get_height()), 0, 20)
+        surface.blit(self.heal_bar, (self.rect.x + 4, self.rect.y))
         surface.blit(self.image, self.rect)
