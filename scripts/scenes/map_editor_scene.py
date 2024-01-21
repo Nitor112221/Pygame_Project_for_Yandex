@@ -393,6 +393,13 @@ class EditorScene:
         pygame.mouse.set_visible(value_visible)
         self.current_index_cursor = index
 
+    def select_tile(self, index):
+        index = index
+        sprite = self.tile.return_sprite(index)
+        self.current_tile = sprite
+        self.current_index_tile = index
+        self.tile.selected_tile = True
+
     def check_prewiew_cursor(self):
         # Проверка на нахождения курсора в пространстве доски и смена его индекса в положительном случае
         if self.focus_board:
@@ -487,38 +494,38 @@ class EditorScene:
                         else:
                             self.prewiew_cursor = True
 
-                self.last_coor_board = self.board.last_coor_board
+                    elif event.key == pygame.K_1:
+                        index = 0
+                        self.select_tile(index)
+                    elif event.key == pygame.K_2:
+                        index = 1
+                        self.select_tile(index)
+                    elif event.key == pygame.K_3:
+                        index = 2
+                        self.select_tile(index)
+                    elif event.key == pygame.K_4:
+                        index = 3
+                        self.select_tile(index)
+                    elif event.key == pygame.K_5:
+                        index = 4
+                        self.select_tile(index)
+                    elif event.key == pygame.K_6:
+                        index = 5
+                        self.select_tile(index)
+                    elif event.key == pygame.K_7:
+                        index = 6
+                        self.select_tile(index)
+                    elif event.key == pygame.K_8:
+                        index = 7
+                        self.select_tile(index)
+                    elif event.key == pygame.K_9:
+                        index = 8
+                        self.select_tile(index)
+                    elif event.key == pygame.K_0:
+                        index = 9
+                        self.select_tile(index)
 
-                # elif event.key == pygame.K_1:
-                #    self.current_tile = 0
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_2:
-                #     self.current_tile = 1
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_3:
-                #     self.current_tile = 2
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_4:
-                #     self.current_tile = 3
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_5:
-                #     self.current_tile = 4
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_6:
-                #     self.current_tile = 5
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_7:
-                #     self.current_tile = 6
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_8:
-                #     self.current_tile = 7
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_9:
-                #     self.current_tile = 8
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
-                # elif event.key == pygame.K_0:
-                #     self.current_tile = 9
-                #     self.current_index_tile = self.tile.return_sprite(self.current_tile)
+                self.last_coor_board = self.board.last_coor_board
 
                 # Обработка нажатий на мышь
                 mouse_pressed = pygame.mouse.get_pressed()
