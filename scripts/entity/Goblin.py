@@ -58,7 +58,19 @@ class Goblin(Enemy):
                                      tools.load_image('goblin/goblin_attack/attack10.png', reverse=True),
                                      tools.load_image('goblin/goblin_attack/attack11.png', reverse=True)],
                      'classic_left': [tools.load_image('goblin/goblin_idle/idle1.png', reverse=True)],
-                     'classic_right': [tools.load_image('goblin/goblin_idle/idle1.png')]
+                     'classic_right': [tools.load_image('goblin/goblin_idle/idle1.png')],
+                     'dead_right': [tools.load_image('goblin/goblin_dead/dead1.png'),
+                                    tools.load_image('goblin/goblin_dead/dead2.png'),
+                                    tools.load_image('goblin/goblin_dead/dead3.png'),
+                                    tools.load_image('goblin/goblin_dead/dead4.png'),
+                                    tools.load_image('goblin/goblin_dead/dead5.png'),
+                                    tools.load_image('goblin/goblin_dead/dead6.png')],
+                     'dead_left': [tools.load_image('goblin/goblin_dead/dead1.png', reverse=True),
+                                   tools.load_image('goblin/goblin_dead/dead2.png', reverse=True),
+                                   tools.load_image('goblin/goblin_dead/dead3.png', reverse=True),
+                                   tools.load_image('goblin/goblin_dead/dead4.png', reverse=True),
+                                   tools.load_image('goblin/goblin_dead/dead5.png', reverse=True),
+                                   tools.load_image('goblin/goblin_dead/dead6.png', reverse=True)],
                      }
         super().__init__(pos_x, pos_y, animation, animation['idle_right'][0], *gruop)
         self.attack_cooldown = 1500

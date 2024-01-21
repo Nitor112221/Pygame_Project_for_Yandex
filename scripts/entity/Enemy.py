@@ -22,7 +22,7 @@ class Enemy(Entity):
         self.heal_bar.set_colorkey((35, 64, 128))
 
     def update(self, player, tile_group):
-        if self.weapon is not None:
+        if self.weapon is not None and not self.is_dead:
             self.weapon.update()
             self.weapon.collide(player)
         super().update(tile_group)
@@ -44,8 +44,8 @@ class Enemy(Entity):
             self.irascibilis = False
 
     def draw(self, surface: pygame.Surface):
-        if self.irascibilis:
-            pygame.draw.rect(surface, 'red', self.rect, 1)
+        # if self.irascibilis:
+        #     pygame.draw.rect(surface, 'red', self.rect, 1)
         self.heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
         self.heal_bar.set_colorkey((35, 64, 128))
         pygame.draw.rect(self.heal_bar, (193, 0, 0),

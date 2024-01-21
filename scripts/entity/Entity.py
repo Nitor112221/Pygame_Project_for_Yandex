@@ -109,6 +109,15 @@ class Entity(pygame.sprite.Sprite):
         if self.attacking:
             self.status = 'attack_' + self.direction
 
+        if not self.is_alive():
+            if self.is_dead is False:
+                self.frame_index = 0
+            self.is_dead = True
+            self.status = 'dead_' + self.direction
+            self.animation_speed = 0.07
+            self.weapon = None
+            self.attacking = False
+
         if self.status is None:
             self.status = 'classic_' + self.direction
 
@@ -129,6 +138,8 @@ class Entity(pygame.sprite.Sprite):
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
+            if not self.is_alive():
+                self.kill()
 
         self.image = animation[int(self.frame_index)]
 
