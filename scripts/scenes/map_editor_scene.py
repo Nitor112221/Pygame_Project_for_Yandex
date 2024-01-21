@@ -19,7 +19,7 @@ class Tile:
         size_side = w, h = 12, 12
         self.additional_surface = pygame.Surface(size_side)
         self.additional_surface.set_colorkey((0, 0, 0))
-        additional_color = pygame.Color((0, 255, 0))
+        additional_color = pygame.Color((0, 214, 27))
         radius = w // 2
         # Рисование окружности на дополнительной поверхности
         pygame.draw.circle(self.additional_surface, additional_color, (w - radius, h - radius), radius)
@@ -330,6 +330,24 @@ class Text:
         self.screen.blit(text_surface, self.pos)
 
 
+class Cursor:
+    def __init__(self, screen):
+        self.hand_cursor = tools.load_image('cursor_map_editor/hand.png', -1)
+        self.list_cursors = [self.hand_cursor]  # [...] - можно добавить еще много разных курсоров
+        self.screen = screen
+
+    def prewiew(self, index, position_mouse):
+        group_cursors = pygame.sprite.Group()
+        position_mouse_x = position_mouse[0]
+        position_mouse_y = position_mouse[1]
+        cursor = pygame.sprite.Sprite()
+        cursor.image = self.list_cursors[index]
+        cursor.rect = cursor.image.get_rect()
+        cursor.rect.x, cursor.rect.y = position_mouse_x - 7, position_mouse_y
+        group_cursors.add(cursor)
+        group_cursors.draw(self.screen)
+
+
 # Главный класс сцены редактора уровней
 class EditorScene:
     def __init__(self, screen, virtual_surface: pygame.Surface, switch_scene, settings):
@@ -340,13 +358,16 @@ class EditorScene:
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
         self.virtual_surface = pygame.Surface((virtual_surface.get_width() * 0.5, virtual_surface.get_height() * 0.5))
-        self.FPS = 60
+        self.FPS = 90
         self.clock = pygame.time.Clock()
+        pygame.mouse.set_visible(False)
+        self.prewiew_cursor = True
 
         # Текущий выбранный тайл для отрисовки
         self.current_tile = None
-        # Индекс текущего выбранного тайла для отрисовки
+        # Индексы текущих выбранных тайла и курсора для отрисовки
         self.current_index_tile = None
+        self.current_index_cursor = None
         # Последнии координаты мыши, поля и переменная нахождения мыши в области поля
         self.last_coordinate = (0, 0)
         self.last_coor_board = (0, 0)
@@ -354,11 +375,12 @@ class EditorScene:
         # Имя файла, для сохранения уровня
         self.filename = 'level_2'
         # Инстансы классов доски, тайла, кнопки
-        self.board = Board(self.screen, self.filename, self.last_coordinate)
-        self.tile = Tile(self.screen)
-        self.button = Button(self.screen)
-        self.text1 = Text(self.screen, 5, 5, 'minecraft_seven_2.ttf')
-        self.text2 = Text(self.screen, 5, 30, 'minecraft_seven_2.ttf')
+        self.board = Board(screen, self.filename, self.last_coordinate)
+        self.tile = Tile(screen)
+        self.button = Button(screen)
+        self.cursor = Cursor(screen)
+        self.text1 = Text(screen, 5, 5, 'minecraft_seven_2.ttf')
+        self.text2 = Text(screen, 5, 30, 'minecraft_seven_2.ttf')
         self.list_text = [self.text1, self.text2]
 
         # Запускаем обработку пользовательских действий
@@ -366,6 +388,25 @@ class EditorScene:
 
     def focused_board(self):
         self.focus_board = self.board.chek_clicked_on_board(self.last_coordinate)
+
+    def update_cursor(self, index=None, value_visible=True):
+        pygame.mouse.set_visible(value_visible)
+        self.current_index_cursor = index
+
+    def check_prewiew_cursor(self):
+        # Проверка на нахождения курсора в пространстве доски и смена его индекса в положительном случае
+        if self.focus_board:
+            if self.prewiew_cursor:
+                self.update_cursor(0, False)
+        else:
+            self.current_index_cursor = None
+
+            # Проверка на нахождения курсора в пространстве тайлов и смена его индекса в положительном случае
+            if self.last_coordinate[1] >= self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
+                if self.tile.last_left_coorx + self.tile.cell_size + self.tile.left \
+                        < self.screen.get_width():
+                    if self.prewiew_cursor:
+                        self.update_cursor(0, False)
 
     def run(self):
         # Определение клавиш для разных операционных систем
@@ -381,6 +422,7 @@ class EditorScene:
 
         running = True
         while running:
+            self.check_prewiew_cursor()
 
             # Обрабатываем нажатия на различные клавиши (является ли нажатой в любой кадр игры)
             keys = pygame.key.get_pressed()
@@ -430,14 +472,20 @@ class EditorScene:
                     self.last_coordinate = event.pos
                     self.board.last_coordinate = self.last_coordinate
                     self.focus_board = self.board.chek_clicked_on_board(self.last_coordinate)
+
                 elif event.type == pygame.KEYDOWN:
                     if event.key == key_to_press:
                         self.save_board_file(self.filename)
                     elif event.key == pygame.K_BACKSPACE:
                         self.board.clear_board()
                     elif event.key == pygame.K_TAB:
-                        self.current_tile = None
-                        self.tile.selected_tile = False
+                        self.update_cursor(None, False)
+                    elif event.key == pygame.K_d and event.mod & pygame.KMOD_CTRL:
+                        if self.prewiew_cursor:
+                            self.prewiew_cursor = False
+                        else:
+                            self.prewiew_cursor = True
+
                 self.last_coor_board = self.board.last_coor_board
 
                 # elif event.key == pygame.K_1:
@@ -522,14 +570,23 @@ class EditorScene:
             self.board.render(self.current_tile)
             self.tile.render(self.current_index_tile)
             self.button.render()
+
             for text_index in range(len(self.list_text)):
                 if text_index != 1:
                     self.list_text[text_index].render(self.last_coor_board, self.focus_board)
                 else:
                     self.list_text[text_index].render(self.board.coor_first_cell, True)
 
+            if pygame.mouse.get_focused():
+                if self.prewiew_cursor:
+                    if self.current_index_cursor is None:
+                        pygame.mouse.set_visible(True)
+                    else:
+                        self.cursor.prewiew(self.current_index_cursor, self.last_coordinate)
+                else:
+                    self.update_cursor()
+
             pygame.display.flip()
-            self.clock.tick(self.FPS)
 
     # Метод отрисовки сцены
     def render(self):
