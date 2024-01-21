@@ -101,7 +101,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             tiles_group.update(player)
             enemy.update(player, tiles_group)
             if is_activity:
-                player_group.update(tiles_group)
+                player_group.update(tiles_group, enemy)
             if player.rect.top >= virtual_surface.get_height():
                 player.get_damage(9999999999999999999999999999999)
         # отображаем все тайлы и игрока

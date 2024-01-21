@@ -1,4 +1,5 @@
 import pygame
+import time
 
 
 class Entity(pygame.sprite.Sprite):
@@ -14,24 +15,38 @@ class Entity(pygame.sprite.Sprite):
         self.jump_speed = -4
         # Мертво ли существо или нет
         self.is_dead = False
+
         # Стоит ли игрок на земле или нет
         self.is_grounded = False
+
         # Способность производить удары игрока
         self.is_shoot = True
+
         # Находится ли игрок в здоровом положении (если он не принял удар)
         self.is_stop = True
+
         # состояние существа (бежит, прыгает, падает и тд)
         self.status: str = 'classic'
+
         #  параметры для аткаи
         self.attacking = False
         self.attack_time = None
         self.attack_cooldown = 100
+
         # направление в которое смотрит существо (left или right)
         self.direction = 'right'
+
         self.frame_index = 0
         self.animation_speed = 0.15
+
         self.hp = 100
         self.max_hp = 100
+
+        self.invulnerability = False
+        self.time_invulnerability = None
+
+        # объект класса Weapon, нужен для нанесения урона
+        self.weapon = None
 
     def update(self, tile_group):
         self.y_speed += self.gravity
@@ -44,6 +59,14 @@ class Entity(pygame.sprite.Sprite):
             self.direction = 'right'
         elif self.x_speed < 0:
             self.direction = 'left'
+        if self.time_invulnerability is not None and time.time() >= self.time_invulnerability:
+            self.time_invulnerability = None
+            self.invulnerability = False
+        if not self.invulnerability:
+            for sprite in tile_group:
+                if sprite.tile_type == 'spike' and pygame.sprite.collide_mask(self, sprite):
+                    self.get_damage(15)
+                    break
         self.cooldowns()
         self.status = self.status.split('_')[0] + '_' + self.direction
         self.get_status()
@@ -95,6 +118,7 @@ class Entity(pygame.sprite.Sprite):
         if self.attacking:
             if current_time - self.attack_time >= self.attack_cooldown:
                 self.attacking = False
+                self.weapon = None
 
     def animate(self):
         try:
@@ -115,7 +139,9 @@ class Entity(pygame.sprite.Sprite):
             return False
 
     def get_damage(self, amount):
-        self.hp -= amount
-        if self.hp <= 0:
-            self.hp = 0
-        return self.hp
+        if not self.invulnerability:
+            self.hp -= amount
+            if self.hp <= 0:
+                self.hp = 0
+            self.invulnerability = True
+            self.time_invulnerability = time.time() + 0.5

@@ -22,6 +22,9 @@ class Enemy(Entity):
         self.heal_bar.set_colorkey((35, 64, 128))
 
     def update(self, player, tile_group):
+        if self.weapon is not None:
+            self.weapon.update()
+            self.weapon.collide(player)
         super().update(tile_group)
         if ((abs(self.rect.centerx - player.rect.x) ** 2) + (
                 abs(self.rect.centery - player.rect.y) ** 2)) ** 0.5 <= self.sight_distance:

@@ -2,6 +2,7 @@ from scripts.entity.Entity import Entity
 import pygame
 import scripts.tools as tools
 import time
+from scripts.entity.weapon import Weapon
 
 
 class BaseHero(Entity):
@@ -38,8 +39,6 @@ class BaseHero(Entity):
         }
 
         super().__init__(tools.load_image('player/Knight.png'), pos_x, pos_y, animation, *group)
-        self.invulnerability = False
-        self.time_invulnerability = None
         self.settings = settings
         self.attack_cooldown = 500
 
@@ -67,10 +66,11 @@ class BaseHero(Entity):
             self.attacking = True
             self.attack_time = pygame.time.get_ticks()
             self.frame_index = 0
+            self.weapon = Weapon(self, 'sword')
         key = pygame.key.get_pressed()
 
         if not (key[getattr(pygame, f"K_{self.settings['Left'].lower()}")] or key[
-            getattr(pygame, f"K_{self.settings['Right'].lower()}")]):
+                getattr(pygame, f"K_{self.settings['Right'].lower()}")]):
             self.x_speed = 0
 
     def jump(self):
@@ -79,22 +79,11 @@ class BaseHero(Entity):
             self.status = 'jump_' + self.direction
             self.is_grounded = False
 
-    def get_damage(self, amount):
-        if not self.invulnerability:
-            super().get_damage(amount)
-            self.invulnerability = True
-            self.time_invulnerability = time.time() + 0.5
-            print(self.hp)
-
-    def update(self, tile_group):
-        if self.time_invulnerability is not None and time.time() >= self.time_invulnerability:
-            self.time_invulnerability = None
-            self.invulnerability = False
-        if not self.invulnerability:
-            for sprite in tile_group:
-                if sprite.tile_type == 'spike' and pygame.sprite.collide_mask(self, sprite):
-                    self.get_damage(15)
-                    break
+    def update(self, tile_group, enemy_group):
+        if self.weapon is not None:
+            self.weapon.update()
+            for enemy in enemy_group:
+                self.weapon.collide(enemy)
         if self.attacking:
             self.animation_speed = 0.115
         else:
