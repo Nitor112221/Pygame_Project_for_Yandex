@@ -1,6 +1,7 @@
 eng = {'Play': 'Play',
        'Control': 'Control',
        'Language': 'Language',
+       'Map editor': 'Map editor',
        'Exit': 'Exit',
        'Upward': 'Up',
        'Left': 'Left',
