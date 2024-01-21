@@ -14,6 +14,17 @@ class Tile:
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
 
+        # Создание дополнительной поверхности
+        self.selected_tile = False
+        size_side = w, h = 12, 12
+        self.additional_surface = pygame.Surface(size_side)
+        self.additional_surface.set_colorkey((0, 0, 0))
+        additional_color = pygame.Color((0, 255, 0))
+        radius = w // 2
+        # Рисование окружности на дополнительной поверхности
+        pygame.draw.circle(self.additional_surface, additional_color, (w - radius, h - radius), radius)
+        self.last_coor_x, self.last_coor_y = None, None
+
         self.color = pygame.Color(70, 70, 70, 255)
         self.bottom = 10
         self.left = 10
@@ -38,7 +49,7 @@ class Tile:
         }
 
     # Метод отрисовки всех тайлов на экране
-    def render(self):
+    def render(self, current_index_tile):
         # Необхлодимо очистить группу, чтобы внести спрайы с новыми координатами и отрисовать их
         self.tile_group = pygame.sprite.Group()
         current_index = 0
@@ -57,8 +68,13 @@ class Tile:
                 self.last_left_coorx = tile.rect.x
             current_index += 1
             self.last_right_coorx = tile.rect.x
+            if current_index - 1 == current_index_tile:
+                self.last_coor_x, self.last_coor_y = tile.rect.x, tile.rect.y
 
         self.tile_group.draw(self.screen)
+        if self.selected_tile:
+            if None not in (self.last_coor_x, self.last_coor_y):
+                self.screen.blit(self.additional_surface, (self.last_coor_x - 5, self.last_coor_y - 5))
 
     # Метод для проверки нажатия на тайл
     def chek_clicked(self, coords):
@@ -421,6 +437,7 @@ class EditorScene:
                         self.board.clear_board()
                     elif event.key == pygame.K_TAB:
                         self.current_tile = None
+                        self.tile.selected_tile = False
                 self.last_coor_board = self.board.last_coor_board
 
                 # elif event.key == pygame.K_1:
@@ -463,6 +480,7 @@ class EditorScene:
                         if return_click_on_tile is not None:
                             self.current_tile = return_click_on_tile[0]
                             self.current_index_tile = return_click_on_tile[1]
+                            self.tile.selected_tile = True
                         self.board.chek_clicked_on_board(event.pos, self.current_tile, self.current_index_tile)
 
                         # Если нажали на кнопку отмены действия и действия были накоплены - отменяем его
@@ -502,7 +520,7 @@ class EditorScene:
             # Отрисовываем все объекты редактора
             self.render()
             self.board.render(self.current_tile)
-            self.tile.render()
+            self.tile.render(self.current_index_tile)
             self.button.render()
             for text_index in range(len(self.list_text)):
                 if text_index != 1:
