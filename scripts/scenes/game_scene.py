@@ -9,6 +9,26 @@ from scripts.scenes.dead_screen import DeadScreen
 from scripts.scenes.pause_scene import PauseScene
 
 
+def save_progress():
+    tags = []
+    with open('data/Saves/tag_coords', 'r') as file:
+        for coords in file.readline().split(','):
+            coords = coords.replace('(', '').replace(')', '')
+            coords = coords.split(';')
+            tags.append(coords)
+    level = int(global_variable.current_level[-1]) - 1
+    change_lvl = [i for i in tags[level][4].split(',') if i]
+    for i in change_lvl:
+        tags[int(i)][3] = 'True'
+    with open('data/Saves/tag_coords', 'w') as file:
+        tag = []
+        for coords in tags:
+            coords = ';'.join(coords)
+            coords = '(' + coords + ')'
+            tag.append(coords)
+        file.write(','.join(tag))
+
+
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
     # создаём новую виртуальную поверхность размерами 48 на 24 игровых тайла
     pygame.mixer.music.stop()
@@ -127,6 +147,11 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             pause_scene.draw()
 
         cursor_group.draw(virtual_surface)
+
+        if player.rect.x >= virtual_surface.get_width():
+            save_progress()
+            running = False
+            switch_scene('world_map')
 
         # трансформируем виртуальную поверхность и растягиваем её на весь экран
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
