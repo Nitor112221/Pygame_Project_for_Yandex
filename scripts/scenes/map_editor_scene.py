@@ -473,13 +473,14 @@ class EditorScene:
                     self.board.last_coordinate = self.last_coordinate
                     self.focus_board = self.board.chek_clicked_on_board(self.last_coordinate)
 
-                elif event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN:
                     if event.key == key_to_press:
                         self.save_board_file(self.filename)
                     elif event.key == pygame.K_BACKSPACE:
                         self.board.clear_board()
                     elif event.key == pygame.K_TAB:
-                        self.update_cursor(None, False)
+                        self.current_tile = None
+                        self.tile.selected_tile = False
                     elif event.key == pygame.K_d and event.mod & pygame.KMOD_CTRL:
                         if self.prewiew_cursor:
                             self.prewiew_cursor = False
