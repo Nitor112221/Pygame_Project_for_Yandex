@@ -2,7 +2,6 @@ import pygame
 import scripts.tools as tools
 from scripts.scenes.language_menu import LanguageScene
 from scripts.scenes.control_menu import ControlScene
-from scripts.scenes.game_scene import game_scene
 from scripts.scenes.map_editor_scene import EditorScene
 from scripts.scenes.WorldMap_scene import world_map_scene
 
