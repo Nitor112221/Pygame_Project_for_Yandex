@@ -202,9 +202,12 @@ class EditorScene:
                         if return_click_on_btn is not None:
                             self.board.back_render()
                     elif mouse_pressed[2]:  # соответствует правой кнопке мыши
+                        self.board.action_lbm = True
                         self.board.delete_tile(event.pos)
+                    else:
+                        self.board.action_lbm = False
 
-                    elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                         if event.pos[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                             # Если колесико вверх - увеличиваем размер сторон ячеек доски
                             self.board.cell_size += 1

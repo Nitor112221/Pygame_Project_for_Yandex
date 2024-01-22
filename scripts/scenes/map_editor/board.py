@@ -12,6 +12,7 @@ class Board:
         self.convert_tile = ConvertTile()
 
         self.color = pygame.Color(70, 70, 70, 255)
+        self.color_rect = pygame.Color(0, 0, 0, 255)
         self.top = 10
         self.left = 10
         self.cell_size = 16
@@ -21,6 +22,7 @@ class Board:
         self.coor_first_cell = [0, 0]
         self.last_coor_board = [0, 0]
         self.stack_action = []  # тут храним стек всех добавленных координат на начало сцены
+        self.action_lbm = False
 
         if tools.is_file_exists(filename, 'data/levels/'):
             self.board = tools.load_level(filename)
@@ -71,10 +73,12 @@ class Board:
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
-        if current_tile is None:
-            color = pygame.Color(255, 0, 0, 255)
+        if self.action_lbm:
+            self.color_rect = pygame.Color(255, 255, 255, 255)
+        elif current_tile is None:
+            self.color_rect = pygame.Color(255, 0, 0, 255)
         else:
-            color = pygame.Color(0, 214, 27, 255)
+            self.color_rect = pygame.Color(0, 214, 27, 255)
         for i in range(len(self.coordinate_cell)):
             for j in range(len(self.coordinate_cell[i])):
                 try:
@@ -84,7 +88,7 @@ class Board:
                             (self.coordinate_cell[i][j][1] + self.cell_size) and \
                             self.last_coordinate[1] < self.height - 58:
                         self.draw_rect(self.surface,
-                                       color,
+                                       self.color_rect,
                                        self.coordinate_cell[i][j][0],
                                        self.coordinate_cell[i][j][1],
                                        self.cell_size,
