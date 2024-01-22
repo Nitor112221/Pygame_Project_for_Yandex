@@ -6,6 +6,7 @@ from scripts.scenes.map_editor.board import Board
 from scripts.scenes.map_editor.button import Button
 from scripts.scenes.map_editor.text import Text
 from scripts.scenes.map_editor.cursor import Cursor
+from scripts.scenes.map_editor.convert_index import ConvertTile
 
 
 # Главный класс сцены редактора уровней
@@ -35,6 +36,7 @@ class EditorScene:
         # Имя файла, для сохранения уровня
         self.filename = 'level_2'
         # Инстансы классов доски, тайла, кнопки
+        self.convert_tile = ConvertTile()
         self.board = Board(screen, self.filename, self.last_coordinate)
         self.tile = Tile(screen)
         self.button = Button(screen)

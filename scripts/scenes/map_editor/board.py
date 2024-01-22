@@ -1,5 +1,6 @@
 import pygame
 import scripts.tools as tools
+from scripts.scenes.map_editor.convert_index import ConvertTile
 
 
 # Главный класс, отвечающий за доску для создания и отрисовки уровня
@@ -8,6 +9,7 @@ class Board:
         self.surface = surface
         self.width = surface.get_width()
         self.height = surface.get_height()
+        self.convert_tile = ConvertTile()
 
         self.color = pygame.Color(70, 70, 70, 255)
         self.top = 10
@@ -64,9 +66,9 @@ class Board:
                 if self.board[col][row] != '.':
                     surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))
                     try:
-                        image = self.tile_images[str(int(self.board[col][row]) + 1)]
+                        image = self.convert_tile.tile_images[str(int(self.board[col][row]) + 1)][0]
                     except KeyError:
-                        image = self.tile_images[f'{str(int(self.board[col][row]) + 1)}-']
+                        image = self.convert_tile.tile_images[f'{str(int(self.board[col][row]) + 1)}-'][0]
                         image.set_alpha(180)
 
                     scale_image = pygame.transform.scale(image, (self.cell_size - 2, self.cell_size - 2))
