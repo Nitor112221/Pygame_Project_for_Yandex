@@ -11,7 +11,7 @@ from data.language import russian, english
 
 pygame.init()
 
-font = pygame.font.SysFont('Comic Sans MS', 72)  # шрифт для текста меню
+font = pygame.font.Font(tools.load_font('NewRocker-Regular.ttf'), 72)  # шрифт для текста меню
 
 
 class ButtonMusic(pygame.sprite.Sprite):
@@ -140,7 +140,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     menu.append_option('Exit', lambda: 'Exit')  # выполняет выход из игры
 
     # загружаем задний фон
-    background = tools.load_image('background.png')
+    background = tools.load_image('background2.png')
     background = pygame.transform.scale(background, virtual_surface.get_size())
 
     # установка курсора мыши на свой
