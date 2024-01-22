@@ -30,19 +30,6 @@ class Board:
                     new_board[i][j] = self.board[i][j]
             self.board = new_board
 
-        self.tile_images = {
-            '1': tools.load_image('platform/platform.png'),
-            '2': tools.load_image('platform/platform_horizontal.png'),
-            '3': tools.load_image('platform/platform_vertical.png'),
-            '4-': tools.load_image('platform/platform.png'),
-            '5-': tools.load_image('platform/platform_horizontal.png'),
-            '6-': tools.load_image('platform/platform_vertical.png'),
-            '7': tools.load_image('disappearing_block/disappearing_block_1.png', -2),
-            '8': tools.load_image('disappearing_block/disappearing_block_2.png', -2),
-            '9': tools.load_image('disappearing_block/disappearing_block_3.png', -2),
-            '10': tools.load_image('spike/spike_classic.png')
-        }
-
     def set_view(self, left, top, size):
         self.top = top
         self.left = left
@@ -66,9 +53,13 @@ class Board:
                 if self.board[col][row] != '.':
                     surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))
                     try:
-                        image = self.convert_tile.tile_images[str(int(self.board[col][row]) + 1)][0]
+                        image = self.convert_tile.tile_images[
+                            str(self.convert_tile.return_index(self.board[col][row]) + 1)
+                        ][0]
                     except KeyError:
-                        image = self.convert_tile.tile_images[f'{str(int(self.board[col][row]) + 1)}-'][0]
+                        image = self.convert_tile.tile_images[
+                            f'{self.convert_tile.return_index(self.board[col][row]) + 1}-'
+                        ][0]
                         image.set_alpha(180)
 
                     scale_image = pygame.transform.scale(image, (self.cell_size - 2, self.cell_size - 2))
@@ -162,7 +153,7 @@ class Board:
                                 self.stack_action.append(push_eleme_to_stack)
 
                             if current_tile is not None:
-                                self.board[i][j] = current_index_tile
+                                self.board[i][j] = self.convert_tile.return_symbol(current_index_tile)
 
                 # Если нужно просто проверить нахождении мыши внутри доски
                 else:
