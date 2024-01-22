@@ -31,7 +31,9 @@ class ConvertTile:
             '25': [tools.load_image('dirt/dirt_up_right.png'), 'e'],
             '26-': [tools.load_image('dirt/dirt_up_right.png'), 'E'],
             '27': [tools.load_image('dirt/dirt_down_right.png'), 't'],
-            '28-': [tools.load_image('dirt/dirt_down_right.png'), 'T']
+            '28-': [tools.load_image('dirt/dirt_down_right.png'), 'T'],
+            '29': [tools.load_image('player/Knight.png'), '@'],
+            '30': [tools.load_image('goblin/goblin_attack/attack1.png'), 'g']
         }
 
     def return_symbol(self, index):
