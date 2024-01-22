@@ -6,7 +6,7 @@ import pygame
 # (координаты левого верхнего угла поражаемой зоны относительно владельца оружия, картеж),
 # (диапазон кадров, начиная с которой игрок получает урон кортеж)),
 # (урон наносимый оружием)
-weapon_stats = {'hummer': ((30, 35), (30, 13), (3, 5), 40),
+weapon_stats = {'hummer': ((30, 35), (30, 13), (4, 5), 40),
                 'sword': ((12, 16), (28, 16), (1, 2), 10)}
 
 
@@ -26,8 +26,8 @@ class Weapon:
             self.rect.x = self.owner.rect.x + self.weapon[1][0]
             self.rect.y = self.owner.rect.y + self.weapon[1][1]
         else:
-            self.rect.x = self.owner.rect.x - self.weapon[1][0]
-            self.rect.y = self.owner.rect.y - self.weapon[1][1]
+            self.rect.right = self.owner.rect.right - self.weapon[1][0]
+            self.rect.bottom = self.owner.rect.bottom - self.weapon[1][1]
 
     def collide(self, target):
         if self.weapon[2][1] >= self.owner.frame_index >= self.weapon[2][0]:

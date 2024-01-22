@@ -48,20 +48,20 @@ class BaseHero(Entity):
             if event.key == getattr(pygame, f"K_{self.settings['Jump'].upper()}"):
                 self.jump()
             if event.key == getattr(pygame, f"K_{self.settings['Left'].lower()}"):
-                self.x_speed += -2
+                self.x_speed += -self.speed
             if event.key == getattr(pygame, f"K_{self.settings['Right'].lower()}"):
-                self.x_speed += 2
+                self.x_speed += self.speed
             if event.key == getattr(pygame, f"K_{self.settings['Down'].lower()}"):
-                self.y_speed += 2
+                self.y_speed += self.speed
         elif event.type == pygame.KEYUP:  # заканчиваем движение
             if event.key == getattr(pygame, f"K_{self.settings['Jump'].upper()}"):
-                self.y_speed = max(-2, self.y_speed)
+                self.y_speed = max(-self.speed, self.y_speed)
             if event.key == getattr(pygame, f"K_{self.settings['Left'].lower()}"):
-                self.x_speed += 2
+                self.x_speed += self.speed
             if event.key == getattr(pygame, f"K_{self.settings['Right'].lower()}"):
-                self.x_speed -= 2
+                self.x_speed -= self.speed
             if event.key == getattr(pygame, f"K_{self.settings['Down'].lower()}"):
-                self.y_speed = max(self.y_speed, self.y_speed - 2)
+                self.y_speed = max(self.y_speed, self.y_speed - self.speed)
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not self.attacking:
             self.attacking = True
             self.attack_time = pygame.time.get_ticks()
@@ -72,12 +72,6 @@ class BaseHero(Entity):
         if not (key[getattr(pygame, f"K_{self.settings['Left'].lower()}")] or key[
                 getattr(pygame, f"K_{self.settings['Right'].lower()}")]):
             self.x_speed = 0
-
-    def jump(self):
-        if self.is_grounded:
-            self.y_speed += self.jump_speed
-            self.status = 'jump_' + self.direction
-            self.is_grounded = False
 
     def update(self, tile_group, enemy_group):
         if self.weapon is not None:

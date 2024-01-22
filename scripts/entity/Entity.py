@@ -12,6 +12,7 @@ class Entity(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(pos_x * 8, pos_y * 8)
         self.x_speed = 0
         self.y_speed = 0
+        self.speed = 2
         self.jump_speed = -4
         # Мертво ли существо или нет
         self.is_dead = False
@@ -49,6 +50,7 @@ class Entity(pygame.sprite.Sprite):
         self.weapon = None
 
     def update(self, tile_group):
+        self.cooldowns()
         self.y_speed += self.gravity
         self.y_speed = min(self.y_speed, 4)
         self.rect.x += self.x_speed
@@ -67,7 +69,6 @@ class Entity(pygame.sprite.Sprite):
                 if sprite.tile_type == 'spike' and pygame.sprite.collide_mask(self, sprite):
                     self.get_damage(15)
                     break
-        self.cooldowns()
         self.status = self.status.split('_')[0] + '_' + self.direction
         self.get_status()
         self.animate()
@@ -80,6 +81,12 @@ class Entity(pygame.sprite.Sprite):
                 self.rect.right = tile.rect.left
             elif self.x_speed < 0:
                 self.rect.left = tile.rect.right
+
+    def jump(self):
+        if self.is_grounded:
+            self.y_speed += self.jump_speed
+            self.status = 'jump_' + self.direction
+            self.is_grounded = False
 
     def check_collision_y(self, tile_group):
         # Проверка столкновений по оси Y
@@ -133,7 +140,7 @@ class Entity(pygame.sprite.Sprite):
         try:
             animation = self.animation[self.status]
         except KeyError:
-            animation = self.animation['classic_right']
+            animation = self.animation['classic_' + self.direction]
 
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):

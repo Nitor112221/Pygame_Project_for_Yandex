@@ -1,8 +1,5 @@
-import pygame
-
 from scripts.entity.Enemy import Enemy
 import scripts.tools as tools
-from scripts.entity.weapon import Weapon
 
 
 class Goblin(Enemy):
@@ -76,12 +73,10 @@ class Goblin(Enemy):
         self.attack_cooldown = 1500
         self.max_hp = 50
         self.hp = 50
+        self.speed = 1.2
+        self.sight_distance = 8 * 20
 
     def update(self, player, tile_group):
-        if not self.attacking:
-            self.attacking = True
-            self.attack_time = pygame.time.get_ticks()
-            self.weapon = Weapon(self, 'hummer')
         if self.attacking:
             self.animation_speed = 0.1
         else:
