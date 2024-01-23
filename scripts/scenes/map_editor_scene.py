@@ -50,21 +50,37 @@ class EditorScene:
         # Запускаем обработку пользовательских действий
         self.run()
 
-    def focused_board(self):
+    def focused_board(self) -> None:
+        """
+        Функция переопределения состояния фокусировки относительно доски
+        :return: None
+        """
         self.focus_board = self.board.chek_clicked_on_board(self.last_coordinate)
 
-    def select_tile(self, index):
+    def select_tile(self, index) -> None:
+        """
+        Функция переопределения текущего тайла
+        :return: None
+        """
         index = index
         sprite = self.tile.return_sprite(index)
         self.current_tile = sprite
         self.current_index_tile = index
         self.tile.selected_tile = True
 
-    def update_cursor(self, index=None, value_visible=True):
+    def update_cursor(self, index=None, value_visible=True) -> None:
+        """
+        Функция переопределения состояния курсора
+        :return: None
+        """
         pygame.mouse.set_visible(value_visible)
         self.current_index_cursor = index
 
-    def check_prewiew_cursor(self):
+    def check_prewiew_cursor(self) -> None:
+        """
+        Функция проверки и переопределения отображения курсора
+        :return: None
+        """
         # Проверка на нахождения курсора в пространстве доски и смена его индекса в положительном случае
         if self.focus_board:
             if self.prewiew_cursor:
@@ -78,7 +94,11 @@ class EditorScene:
                     if self.prewiew_cursor:
                         self.update_cursor(0, False)
 
-    def run(self):
+    def run(self) -> None:
+        """
+        Функция главного цикла всех событий
+        :return: None
+        """
         # Определение клавиш для разных операционных систем
         if sys.platform.startswith('win'):
             # Для Windows
@@ -236,37 +256,46 @@ class EditorScene:
 
             # Отрисовываем все объекты редактора
             self.render()
-            self.board.render(self.current_tile)
-            self.tile.render(self.current_index_tile)
-            self.button.render()
-
-            for text_index in range(len(self.list_text)):
-                if text_index != 1:
-                    self.list_text[text_index].render(self.last_coor_board, self.focus_board)
-                else:
-                    self.list_text[text_index].render(self.board.coor_first_cell, True)
-
-            if pygame.mouse.get_focused():
-                if self.prewiew_cursor:
-                    if self.current_index_cursor is None:
-                        pygame.mouse.set_visible(True)
-                    else:
-                        self.cursor.prewiew(self.current_index_cursor, self.last_coordinate)
-                else:
-                    self.update_cursor()
-
-            self.notification.render()
-
-            pygame.display.flip()
 
     # Метод отрисовки сцены
-    def render(self):
+    def render(self) -> None:
+        """
+        Функция отрисовки всех элементов на экране
+        :return: None
+        """
         self.virtual_surface.fill((0, 0, 0))
         scaled_surface = pygame.transform.scale(self.virtual_surface, self.screen.get_size())
         self.screen.blit(scaled_surface, (0, 0))
 
+        self.board.render(self.current_tile)
+        self.tile.render(self.current_index_tile)
+        self.button.render()
+
+        for text_index in range(len(self.list_text)):
+            if text_index != 1:
+                self.list_text[text_index].render(self.last_coor_board, self.focus_board)
+            else:
+                self.list_text[text_index].render(self.board.coor_first_cell, True)
+
+        if pygame.mouse.get_focused():
+            if self.prewiew_cursor:
+                if self.current_index_cursor is None:
+                    pygame.mouse.set_visible(True)
+                else:
+                    self.cursor.prewiew(self.current_index_cursor, self.last_coordinate)
+            else:
+                self.update_cursor()
+
+        self.notification.render()
+
+        pygame.display.flip()
+
     # Метод сохранения уровня в файл в виде символов
-    def save_board_file(self, filename):
+    def save_board_file(self, filename) -> None:
+        """
+        Функция сохранения уровня в файл
+        :return: None
+        """
         file_path = 'data/levels/' + filename
         board = self.board.board
 

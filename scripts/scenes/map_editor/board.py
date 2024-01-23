@@ -16,7 +16,7 @@ class Board:
         self.top = 10
         self.left = 10
         self.cell_size = 16
-        self.board = [['.'] * 48 for _ in range(24)]
+        self.board = [['.'] * 200 for _ in range(40)]
         self.coordinate_cell = []
         self.last_coordinate = last_coordinate
         self.coor_first_cell = [0, 0]
@@ -32,12 +32,20 @@ class Board:
                     new_board[i][j] = self.board[i][j]
             self.board = new_board
 
-    def set_view(self, left, top, size):
-        self.top = top
-        self.left = left
+    def set_view(self, left, top, size) -> None:
+        """
+        Функция изменения основных параметров доски
+        :return: None
+        """
+        self.top = left
+        self.left = top
         self.cell_size = size
 
-    def render(self, current_tile=None):
+    def render(self, current_tile=None) -> None:
+        """
+        Функция отрисовки всех элементов доски
+        :return: None
+        """
         coordinate = []
         self.coordinate_cell = []
         for col in range(len(self.board)):
@@ -74,12 +82,15 @@ class Board:
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
+        # В зависимости от текущего режима (состояния мыши) меняем выделения ячейки на другой цвет
         if self.action_lbm:
             self.color_rect = pygame.Color(255, 255, 255, 255)
         elif current_tile is None:
             self.color_rect = pygame.Color(255, 0, 0, 255)
         else:
             self.color_rect = pygame.Color(0, 214, 27, 255)
+
+        # Отрисовываем всю доску, проходясь по списку ее ячеек
         for i in range(len(self.coordinate_cell)):
             for j in range(len(self.coordinate_cell[i])):
                 try:
@@ -95,13 +106,17 @@ class Board:
                                        self.cell_size,
                                        self.cell_size,
                                        2)
-
+                        # Запоминаем последнии координаты наведения мыши на доску
                         self.last_coor_board = (i, j)
 
                 except TypeError:
                     pass
 
-    def back_render(self):
+    def back_render(self) -> None:
+        """
+        Функция отмены последнего нарисованного тайла
+        :return: None
+        """
         if len(self.stack_action) != 0:
             cur_elem_stack = self.stack_action[-1]
             color = pygame.Color((0, 0, 0))
@@ -115,13 +130,21 @@ class Board:
             self.board[cur_elem_stack[1][0]][cur_elem_stack[1][1]] = '.'
             del self.stack_action[-1]
 
-    def clear_board(self):
+    def clear_board(self) -> None:
+        """
+        Функция полного очищения доски
+        :return: None
+        """
         for col in range(len(self.board)):
             for row in range(len(self.board[col])):
                 self.board[col][row] = '.'
         self.render()
 
-    def delete_tile(self, coor):
+    def delete_tile(self, coor) -> None:
+        """
+        Функция удаления нарисованного тайла
+        :return: None
+        """
         for col in range(len(self.coordinate_cell)):
             for row in range(len(self.coordinate_cell[col])):
                 if self.coordinate_cell[col][row][0] < coor[0] < \
@@ -132,7 +155,18 @@ class Board:
                     self.board[col][row] = '.'
         self.render()
 
-    def draw_rect(self, surface, color, coor_x, coor_y, size_x, size_y, gauge=0):
+    def draw_rect(self, surface, color, coor_x, coor_y, size_x, size_y, gauge=0) -> None:
+        """
+        Функция рисования прямоугольной фигуры
+        :param surface: pygame.Surface
+        :param color: pygame.Color
+        :param coor_x: int
+        :param coor_y: int
+        :param size_x: int
+        :param size_y: int
+        :param gauge: int
+        :return: None
+        """
         pygame.draw.rect(surface,
                          color,
                          (coor_x,
@@ -140,7 +174,14 @@ class Board:
                           size_x,
                           size_y), gauge)
 
-    def chek_clicked_on_board(self, coor, current_tile=None, current_index_tile=None):
+    def chek_clicked_on_board(self, coor, current_tile=None, current_index_tile=None) -> None or bool:
+        """
+        Функция проверки нажатия на доску и выполнения определенных действий
+        :param coor: tuple
+        :param current_tile: pygame.Sprite
+        :param current_index_tile: int
+        :return: None or bool
+        """
         for i in range(len(self.coordinate_cell)):
             for j in range(len(self.coordinate_cell[i])):
                 # Если вызвали метод для отрисовки тайла
