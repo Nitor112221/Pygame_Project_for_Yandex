@@ -7,6 +7,7 @@ from scripts.scenes.map_editor.button import Button
 from scripts.scenes.map_editor.text import Text
 from scripts.scenes.map_editor.cursor import Cursor
 from scripts.scenes.map_editor.convert_index import ConvertTile
+from scripts.scenes.map_editor.notification import Notification
 
 
 # Главный класс сцены редактора уровней
@@ -36,6 +37,7 @@ class EditorScene:
         # Имя файла, для сохранения уровня
         self.filename = 'level_2'
         # Инстансы классов доски, тайла, кнопки
+        self.notification = Notification(self.screen)
         self.convert_tile = ConvertTile()
         self.board = Board(screen, self.filename, self.last_coordinate)
         self.tile = Tile(screen)
@@ -252,6 +254,8 @@ class EditorScene:
                         self.cursor.prewiew(self.current_index_cursor, self.last_coordinate)
                 else:
                     self.update_cursor()
+
+            self.notification.render()
 
             pygame.display.flip()
 

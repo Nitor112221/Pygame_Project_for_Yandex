@@ -50,7 +50,8 @@ class Board:
                                self.cell_size,
                                1)
                 if col == 0 and row == 0:
-                    self.coor_first_cell = [row * self.cell_size + self.left, col * self.cell_size + self.top]
+                    self.coor_first_cell = [(row * self.cell_size + self.left) // 10,
+                                            (col * self.cell_size + self.top) // 10]
 
                 if self.board[col][row] != '.':
                     surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))

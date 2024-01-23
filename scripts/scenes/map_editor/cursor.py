@@ -5,7 +5,7 @@ import scripts.tools as tools
 # Главный класс, отвечающий за смену курсора
 class Cursor:
     def __init__(self, screen):
-        self.hand_cursor = tools.load_image('cursor_map_editor/hand.png', -1)
+        self.hand_cursor = tools.load_image('map_editor/cursor_map_editor/hand.png', -1)
         self.list_cursors = [self.hand_cursor]  # [...] - можно добавить еще много разных курсоров
         self.screen = screen
 
