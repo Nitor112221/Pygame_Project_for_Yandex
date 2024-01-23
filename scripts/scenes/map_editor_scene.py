@@ -138,7 +138,7 @@ class EditorScene:
 
                 # Обработка нажатий на клавиатуру (была ли нажата любой в кадр игры)
                 if event.type == pygame.KEYDOWN:
-                    if event.key == key_to_press:
+                    if event.key == pygame.K_RETURN:
                         self.save_board_file(self.filename)
                     elif event.key == pygame.K_ESCAPE:
                         running = False
