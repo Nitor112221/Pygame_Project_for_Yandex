@@ -70,6 +70,7 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
     cursor = pygame.sprite.Sprite(cursor_group)
     cursor.image = cursor_img
     cursor.rect = cursor.image.get_rect()
+    focused = True
 
     dragging = False
     start_pos = (0, 0)
@@ -81,7 +82,11 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
                 running = False
                 switch_scene(None)
             elif event.type == pygame.MOUSEMOTION:
-                cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
+                if pygame.mouse.get_focused():
+                    focused = True
+                    cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
+                else:
+                    focused = False
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
                 start_pos = pygame.mouse.get_pos()
@@ -147,7 +152,8 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
                              (virtual_surface.get_width() // 2 - scaled_map.get_width() // 2 - scroll_x,
                               virtual_surface.get_height() // 2 - scaled_map.get_height() // 2 - scroll_y))
 
-        cursor_group.draw(virtual_surface)
+        if focused:
+            cursor_group.draw(virtual_surface)
 
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
         screen.blit(scaled_surface, (0, 0))

@@ -149,6 +149,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     cursor = pygame.sprite.Sprite(cursor_group)
     cursor.image = cursor_img
     cursor.rect = cursor.image.get_rect()
+    focused = True
 
     while running:
         for event in pygame.event.get():
@@ -168,7 +169,11 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                         switch_scene(None)
 
             if event.type == pygame.MOUSEMOTION:
-                cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
+                if pygame.mouse.get_focused():
+                    focused = True
+                    cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
+                else:
+                    focused = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:  # обработка нажатий мыши
                 if menu.check_mouse_event(100, screen, virtual_surface, settings) == 'Exit':
@@ -190,7 +195,8 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             extra_scene.draw(virtual_surface)
 
         music_btn.draw(virtual_surface)
-        cursor_group.draw(virtual_surface)
+        if focused:
+            cursor_group.draw(virtual_surface)
 
         # отрисовываем сцену на экране
         scaled_surface = pygame.transform.scale(virtual_surface, screen.get_size())
