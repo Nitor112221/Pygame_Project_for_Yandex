@@ -1,5 +1,6 @@
 import pygame
 import scripts.tools as tools
+from scripts.scenes.map_editor.convert_index import ConvertTile
 
 
 # Главный класс, отвечающий за доску для создания и отрисовки уровня
@@ -8,8 +9,10 @@ class Board:
         self.surface = surface
         self.width = surface.get_width()
         self.height = surface.get_height()
+        self.convert_tile = ConvertTile()
 
         self.color = pygame.Color(70, 70, 70, 255)
+        self.color_rect = pygame.Color(0, 0, 0, 255)
         self.top = 10
         self.left = 10
         self.cell_size = 16
@@ -19,6 +22,7 @@ class Board:
         self.coor_first_cell = [0, 0]
         self.last_coor_board = [0, 0]
         self.stack_action = []  # тут храним стек всех добавленных координат на начало сцены
+        self.action_lbm = False
 
         if tools.is_file_exists(filename, 'data/levels/'):
             self.board = tools.load_level(filename)
@@ -27,19 +31,6 @@ class Board:
                 for j in range(len(self.board[i])):
                     new_board[i][j] = self.board[i][j]
             self.board = new_board
-
-        self.tile_images = {
-            '1': tools.load_image('platform/platform.png'),
-            '2': tools.load_image('platform/platform_horizontal.png'),
-            '3': tools.load_image('platform/platform_vertical.png'),
-            '4-': tools.load_image('platform/platform.png'),
-            '5-': tools.load_image('platform/platform_horizontal.png'),
-            '6-': tools.load_image('platform/platform_vertical.png'),
-            '7': tools.load_image('disappearing_block/disappearing_block_1.png', -2),
-            '8': tools.load_image('disappearing_block/disappearing_block_2.png', -2),
-            '9': tools.load_image('disappearing_block/disappearing_block_3.png', -2),
-            '10': tools.load_image('spike/spike_classic.png')
-        }
 
     def set_view(self, left, top, size):
         self.top = top
@@ -59,14 +50,19 @@ class Board:
                                self.cell_size,
                                1)
                 if col == 0 and row == 0:
-                    self.coor_first_cell = [row * self.cell_size + self.left, col * self.cell_size + self.top]
+                    self.coor_first_cell = [(row * self.cell_size + self.left) // 10,
+                                            (col * self.cell_size + self.top) // 10]
 
                 if self.board[col][row] != '.':
                     surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))
                     try:
-                        image = self.tile_images[str(int(self.board[col][row]) + 1)]
+                        image = self.convert_tile.tile_images[
+                            str(self.convert_tile.return_index(self.board[col][row]) + 1)
+                        ][0]
                     except KeyError:
-                        image = self.tile_images[f'{str(int(self.board[col][row]) + 1)}-']
+                        image = self.convert_tile.tile_images[
+                            f'{self.convert_tile.return_index(self.board[col][row]) + 1}-'
+                        ][0]
                         image.set_alpha(180)
 
                     scale_image = pygame.transform.scale(image, (self.cell_size - 2, self.cell_size - 2))
@@ -78,10 +74,12 @@ class Board:
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
-        if current_tile is None:
-            color = pygame.Color(255, 0, 0, 255)
+        if self.action_lbm:
+            self.color_rect = pygame.Color(255, 255, 255, 255)
+        elif current_tile is None:
+            self.color_rect = pygame.Color(255, 0, 0, 255)
         else:
-            color = pygame.Color(0, 214, 27, 255)
+            self.color_rect = pygame.Color(0, 214, 27, 255)
         for i in range(len(self.coordinate_cell)):
             for j in range(len(self.coordinate_cell[i])):
                 try:
@@ -91,7 +89,7 @@ class Board:
                             (self.coordinate_cell[i][j][1] + self.cell_size) and \
                             self.last_coordinate[1] < self.height - 58:
                         self.draw_rect(self.surface,
-                                       color,
+                                       self.color_rect,
                                        self.coordinate_cell[i][j][0],
                                        self.coordinate_cell[i][j][1],
                                        self.cell_size,
@@ -160,7 +158,7 @@ class Board:
                                 self.stack_action.append(push_eleme_to_stack)
 
                             if current_tile is not None:
-                                self.board[i][j] = current_index_tile
+                                self.board[i][j] = self.convert_tile.return_symbol(current_index_tile)
 
                 # Если нужно просто проверить нахождении мыши внутри доски
                 else:

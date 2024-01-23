@@ -1,5 +1,6 @@
 import pygame
 import scripts.tools as tools
+from scripts.scenes.map_editor.convert_index import ConvertTile
 
 
 # Главный класс, отвечающий за тайлы для рисования
@@ -10,6 +11,7 @@ class Tile:
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
+        self.convert_tile = ConvertTile()
 
         # Создание дополнительной поверхности
         self.selected_tile = False
@@ -50,9 +52,9 @@ class Tile:
         # Необхлодимо очистить группу, чтобы внести спрайы с новыми координатами и отрисовать их
         self.tile_group = pygame.sprite.Group()
         current_index = 0
-        for key, value in self.tile_images.items():
+        for key, value in self.convert_tile.tile_images.items():
             tile = pygame.sprite.Sprite(self.tile_group)
-            scaled_image = pygame.transform.scale(value, (self.cell_size, self.cell_size))
+            scaled_image = pygame.transform.scale(value[0], (self.cell_size, self.cell_size))
 
             if key[-1] == '-':
                 scaled_image.set_alpha(self.alpha)

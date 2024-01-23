@@ -17,7 +17,7 @@ class Button:
         self.group = pygame.sprite.Group()
 
         self.tile_images = {
-            1: tools.load_image('menu_buttons/editor_back.png')
+            1: tools.load_image('map_editor/menu_buttons/editor_back.png')
         }
 
     def render(self):

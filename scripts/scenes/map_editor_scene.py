@@ -1,24 +1,25 @@
 import sys
 import time
 import pygame
-import scripts.tools as tools
 from scripts.scenes.map_editor.tile import Tile
 from scripts.scenes.map_editor.board import Board
 from scripts.scenes.map_editor.button import Button
 from scripts.scenes.map_editor.text import Text
 from scripts.scenes.map_editor.cursor import Cursor
+from scripts.scenes.map_editor.convert_index import ConvertTile
+from scripts.scenes.map_editor.notification import Notification
 
 
 # Главный класс сцены редактора уровней
 class EditorScene:
-    def __init__(self, screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings):
+    def __init__(self, screen, virtual_surface: pygame.Surface, switch_scene, settings):
         # основные характеристики сцены
         self.switch_scene = switch_scene
         self.settings = settings
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
-        self.virtual_surface = pygame.Surface(screen.get_size())
+        self.virtual_surface = pygame.Surface((virtual_surface.get_width() * 0.5, virtual_surface.get_height() * 0.5))
         self.FPS = 90
         self.clock = pygame.time.Clock()
         pygame.mouse.set_visible(False)
@@ -36,12 +37,14 @@ class EditorScene:
         # Имя файла, для сохранения уровня
         self.filename = 'level_2'
         # Инстансы классов доски, тайла, кнопки
-        self.board = Board(self.virtual_surface, self.filename, self.last_coordinate)
-        self.tile = Tile(self.virtual_surface)
-        self.button = Button(self.virtual_surface)
-        self.cursor = Cursor(self.virtual_surface)
-        self.text1 = Text(self.virtual_surface, 5, 5, 'minecraft_seven_2.ttf')
-        self.text2 = Text(self.virtual_surface, 5, 30, 'minecraft_seven_2.ttf')
+        self.notification = Notification(self.screen)
+        self.convert_tile = ConvertTile()
+        self.board = Board(screen, self.filename, self.last_coordinate)
+        self.tile = Tile(screen)
+        self.button = Button(screen)
+        self.cursor = Cursor(screen)
+        self.text1 = Text(screen, 5, 5, 'minecraft_seven_2.ttf')
+        self.text2 = Text(screen, 5, 30, 'minecraft_seven_2.ttf')
         self.list_text = [self.text1, self.text2]
 
         # Запускаем обработку пользовательских действий
@@ -129,7 +132,7 @@ class EditorScene:
                     running = False
                     self.switch_scene(None)
                 elif event.type == pygame.MOUSEMOTION:
-                    self.last_coordinate = tools.hover(event.pos, self.screen, self.virtual_surface)
+                    self.last_coordinate = event.pos
                     self.board.last_coordinate = self.last_coordinate
                     self.focus_board = self.board.chek_clicked_on_board(self.last_coordinate)
 
@@ -189,26 +192,25 @@ class EditorScene:
                 try:
                     if mouse_pressed[0]:  # соответствует левой кнопке мыши
                         # Меняем выбранный тайл на новый, если нажали на него
-                        return_click_on_tile = self.tile.chek_clicked(
-                            tools.hover(event.pos, self.screen, self.virtual_surface))
+                        return_click_on_tile = self.tile.chek_clicked(event.pos)
                         if return_click_on_tile is not None:
                             self.current_tile = return_click_on_tile[0]
                             self.current_index_tile = return_click_on_tile[1]
                             self.tile.selected_tile = True
-                        self.board.chek_clicked_on_board(tools.hover(event.pos, self.screen, self.virtual_surface),
-                                                         self.current_tile, self.current_index_tile)
+                        self.board.chek_clicked_on_board(event.pos, self.current_tile, self.current_index_tile)
 
                         # Если нажали на кнопку отмены действия и действия были накоплены - отменяем его
-                        return_click_on_btn = self.button.chek_clicked(
-                            tools.hover(event.pos, self.screen, self.virtual_surface))
+                        return_click_on_btn = self.button.chek_clicked(event.pos)
                         if return_click_on_btn is not None:
                             self.board.back_render()
                     elif mouse_pressed[2]:  # соответствует правой кнопке мыши
-                        self.board.delete_tile(tools.hover(event.pos, self.screen, self.virtual_surface))
+                        self.board.action_lbm = True
+                        self.board.delete_tile(event.pos)
+                    else:
+                        self.board.action_lbm = False
 
-                    elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
-                        if tools.hover(event.pos, self.screen, self.virtual_surface)[1] < self.screen.get_height() - (
-                                self.tile.cell_size + self.tile.bottom):
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
+                        if event.pos[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                             # Если колесико вверх - увеличиваем размер сторон ячеек доски
                             self.board.cell_size += 1
                             self.focused_board()
@@ -218,8 +220,7 @@ class EditorScene:
                                     < self.screen.get_width():
                                 self.tile.shift_x += 10
                     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
-                        if tools.hover(event.pos, self.screen, self.virtual_surface)[1] < self.screen.get_height() - (
-                                self.tile.cell_size + self.tile.bottom):
+                        if event.pos[1] < self.screen.get_height() - (self.tile.cell_size + self.tile.bottom):
                             # Если колесико вниз - увеличиваем размер сторон ячеек доски до миниального размера = 8
                             if self.board.cell_size > 8:
                                 self.board.cell_size -= 1
@@ -234,7 +235,7 @@ class EditorScene:
                     pass
 
             # Отрисовываем все объекты редактора
-            self.virtual_surface.fill((0, 0, 0))
+            self.render()
             self.board.render(self.current_tile)
             self.tile.render(self.current_index_tile)
             self.button.render()
@@ -254,11 +255,13 @@ class EditorScene:
                 else:
                     self.update_cursor()
 
-            self.render()
+            self.notification.render()
+
             pygame.display.flip()
 
     # Метод отрисовки сцены
     def render(self):
+        self.virtual_surface.fill((0, 0, 0))
         scaled_surface = pygame.transform.scale(self.virtual_surface, self.screen.get_size())
         self.screen.blit(scaled_surface, (0, 0))
 
@@ -267,7 +270,7 @@ class EditorScene:
         file_path = 'data/levels/' + filename
         board = self.board.board
 
-        # Очищаем содержимое файла для загрузкиб, а него новой карты уровня
+        # Очищаем содержимое файла для загрузки а него новой карты уровня
         with open(file_path, 'w') as file_level:
             file_level.write('')
 
