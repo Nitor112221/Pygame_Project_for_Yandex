@@ -73,14 +73,12 @@ class LanguageScene:
                     (self.languages.index(self.selected_language) - 1) % len(self.languages)]  # Листаем вверх
                 self.selected_language = self.languages[ind]
                 self.settings['Language'] = self.selected_language
-                print(f"Selected Language: {self.selected_language}")
             elif event.key == pygame.K_DOWN:
                 ind = (self.languages.index(self.selected_language) + 1) % len(self.languages)
                 self.selected_language = self.languages[
                     (self.languages.index(self.selected_language) + 1) % len(self.languages)]  # Листаем вниз
                 self.selected_language = self.languages[ind]
                 self.settings['Language'] = self.selected_language
-                print(f"Selected Language: {self.selected_language}")
 
     def is_inside_menu(self, mouse_pos, surface: pygame.Surface) -> bool:
         # метод проверки на то, что мышка находится в пределах доп экрана

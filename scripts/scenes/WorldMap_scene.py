@@ -2,19 +2,18 @@ import pygame
 import scripts.tools as tools
 from scripts.scenes.game_scene import game_scene
 import global_variable
-from data.language import russian, english
 
 
 class Tag(pygame.sprite.Sprite):
-    def __init__(self, pos_x: int, pos_y: int, level: str, unlock: bool, *group, is_available=False):
+    # класс реализующий метку на карте игрового мира
+    def __init__(self, pos_x: int, pos_y: int, level: str, unlock: bool, *group):
         super().__init__(*group)
         self.image_list = [tools.load_image('WorldMap/tag.png'), tools.load_image('WorldMap/tag_unlock.png')]
         self.image = self.image_list[1 if unlock else 0]
         self.rect = self.image.get_rect().move(pos_x, pos_y)
-        self.is_available = is_available
-        self.scroll_y = 0
-        self.level = level
-        self.unlock = unlock
+        self.scroll_y = 0  # переменная отвечает за подпрыгивание значка при навидении
+        self.level = level  # название уровня на который ведёт
+        self.unlock = unlock  # можно ли зайти
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect.move(0, -self.scroll_y))
@@ -44,6 +43,7 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
     all_sprite = pygame.sprite.Group()
     tag_group = pygame.sprite.Group()
 
+    # создание всех тэгов на карте
     with open('data/Saves/tag_coords', 'r') as file:
         for coords in file.readline().split(','):
             coords = coords.replace('(', '').replace(')', '')
@@ -51,6 +51,7 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
             Tag(int(coords[0]), int(coords[1]), str(coords[2]), True if coords[3] == 'True' else False,
                 all_sprite, tag_group)
 
+    # базовые параметры
     fps = 60
     clock = pygame.time.Clock()
 
@@ -74,6 +75,7 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
 
     dragging = False
     start_pos = (0, 0)
+
     running = True
     while running:
         world_map_art = world_map.copy()
@@ -81,12 +83,13 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
             if event.type == pygame.QUIT:
                 running = False
                 switch_scene(None)
-            elif event.type == pygame.MOUSEMOTION:
+            elif event.type == pygame.MOUSEMOTION:  # обновление положения курсора
                 if pygame.mouse.get_focused():
                     focused = True
                     cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
                 else:
                     focused = False
+            # перемещение карты мышкой
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 dragging = True
                 start_pos = pygame.mouse.get_pos()
@@ -96,6 +99,7 @@ def world_map_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, swi
                         switch_scene(game_scene)
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 dragging = False
+            # перемещение по карте с помощью клавиатуры
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False

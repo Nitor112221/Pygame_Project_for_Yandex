@@ -10,6 +10,9 @@ from scripts.scenes.pause_scene import PauseScene
 
 
 def save_progress():
+    # структура файла с тэгами:
+    # (x;y;название уровня, который открывают;
+    # доступен ли для запуска;уровни, которые станут доступными после прохождения этого),тоже самое и тд
     tags = []
     with open('data/Saves/tag_coords', 'r') as file:
         for coords in file.readline().split(','):
@@ -30,6 +33,7 @@ def save_progress():
 
 
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
+    # неиспользованный аргумент virtual_surface (нажен для полиморфизма)
     pygame.mixer.music.stop()
     # создаём новую виртуальную поверхность размерами 48 на 24 игровых тайла
 
@@ -45,6 +49,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     enemy = pygame.sprite.Group()
+
     # полезные флаги
     dead_scene = None
     is_activity = True
@@ -84,12 +89,12 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
             elif event.type == pygame.MOUSEMOTION:
                 cursor.rect.topleft = tools.hover(event.pos, screen, virtual_surface)  # обнавляем положение курсора
             elif event.type == pygame.MOUSEBUTTONUP:
-                if dead_scene is not None:
+                if dead_scene is not None:  # получаем результаты и обрабатываем нажатия на экране смерти
                     result = dead_scene.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface),
                                                switch_scene)
                     if result is not None:
                         running = False
-                if pause_scene is not None:
+                if pause_scene is not None:  # получаем и обрабатываем результат нажатия при октрытом меню
                     result = pause_scene.update(tools.hover(pygame.mouse.get_pos(), screen, virtual_surface),
                                                 switch_scene)
                     if result == 'continue':
@@ -99,16 +104,18 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                     if result == 'map':
                         global_variable.is_music_play = False
                         running = False
+
+            # обработка паузы
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 is_pause = not is_pause
                 if is_pause:
                     pause_scene = PauseScene(virtual_surface, settings)
                 else:
                     pause_scene = None
-
             if is_activity and not is_pause:
                 player.handler_event(event)
 
+        # запуск смерти персонажа
         if not player.is_alive() and dead_scene is None:
             dead_scene = DeadScreen(virtual_surface, settings)
             is_activity = False
@@ -121,7 +128,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         for sprite in all_sprites:
             camera.apply(sprite)
 
-        if not is_pause:
+        if not is_pause:  # если игра не на паузе, то обнавляем всё
             tiles_group.update(player)
             enemy.update(player, tiles_group)
             if is_activity:
@@ -137,6 +144,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
                 en.draw(virtual_surface)
         player_group.draw(virtual_surface)
 
+        # отрисовка хилбара
         pygame.draw.rect(heal_bar, (193, 0, 0),
                          pygame.Rect(0, 0, int((heal_bar.get_width()) * (player.hp / player.max_hp)),
                                      heal_bar.get_height() - 8), 0, 20)
@@ -152,6 +160,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
 
         cursor_group.draw(virtual_surface)
 
+        # если игрок вышел за границу уровня, то он его прошёл
         if player.rect.x >= virtual_surface.get_width():
             save_progress()
             global_variable.is_music_play = False

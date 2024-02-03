@@ -11,8 +11,8 @@ from data.language import russian, english
 
 pygame.init()
 
-font_eng = pygame.font.Font(tools.load_font('NewRocker-Regular.ttf'), 72)  # шрифт для текста меню
-font_rus = pygame.font.SysFont('Comic Sans MS', 72)  # шрифт для текста меню
+font_eng = pygame.font.Font(tools.load_font('NewRocker-Regular.ttf'), 72)  # шрифт для текста меню на английском
+font_rus = pygame.font.SysFont('Comic Sans MS', 72)  # шрифт для текста меню на русском
 
 
 class ButtonMusic(pygame.sprite.Sprite):
@@ -127,7 +127,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         extra_scene = ControlScene(*virtual_surface.get_size(), settings)
         menu.is_action_menu = False
 
-    def open_editor_scene() -> None:
+    def open_editor_scene() -> None:  # функция открывающзая редактор карт
         nonlocal running
         running = False
         switch_scene(EditorScene)
@@ -139,9 +139,9 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
 
     # создание кнопок меню
     menu.append_option('Play', open_game_scene)  # запускает игру
-    menu.append_option('Control', open_control_scene)  # открывает окно изменения настроек
+    menu.append_option('Control', open_control_scene)  # открывает окно просмотра управления
     menu.append_option('Language', open_language_scene)  # открывает окно выбора языка
-    menu.append_option('Map editor', open_editor_scene)  # открывает окно создания сцен
+    menu.append_option('Map editor', open_editor_scene)  # открывает окно создания карт
     menu.append_option('Exit', lambda: 'Exit')  # выполняет выход из игры
 
     # загружаем задний фон

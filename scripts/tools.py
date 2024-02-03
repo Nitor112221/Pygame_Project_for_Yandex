@@ -76,7 +76,7 @@ class Tile(pygame.sprite.Sprite):
             self.image = tile_images[tile_type].copy()
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
-            if 'disappearing_block' in tile_type:
+            if 'disappearing_block' in tile_type:  # если блок падающий, то добавляем ему доп параметры
                 self.disappearing_time = None
                 self.original_image = tile_images[tile_type].copy()  # Исходное изображение блока
                 if '1' in tile_type:
@@ -85,20 +85,21 @@ class Tile(pygame.sprite.Sprite):
                     self.dotted_line = load_image('disappearing_block/dotted_line_2.png')
                 elif '3' in tile_type:
                     self.dotted_line = load_image('disappearing_block/dotted_line_3.png')
-        else:
+        else:  # создание ориентировочного тайла, нужного для ориентации камеры
             self.image = tile_images['platform'].copy()
             self.rect = pygame.Rect(0, 0, 0, 0).move(
                 tile_width * pos_x, tile_height * pos_y)
 
     def update(self, player):
+        # метод, который добавляет разным блокам уникальное поведение (пока что есть только исчезающие блоки)
         if 'disappearing_block' in self.tile_type:
             if player.rect.move(0, 2).colliderect(self.rect) and not self.disappearing_time:
+                # если игрок наступил на блок, и таймер ещё не идёт запускаем таймер
                 self.disappearing_time = time.time() + 0.6
             if self.disappearing_time is not None and time.time() >= self.disappearing_time:
+                # проверяем на то вышло ли время исчезновения
                 self.image = self.dotted_line.copy()
                 self.is_touchable = False
-                if player.rect.move(0, 2).colliderect(self.rect):
-                    player.is_grounded = False
             if self.disappearing_time is not None and time.time() >= self.disappearing_time + 3:
                 # Восстанавливаем изображение блока
                 self.image = self.original_image.copy()
@@ -123,10 +124,6 @@ def load_default_options():
 def load_font(font_name):
     font_path = 'data/fonts/'
     return font_path + font_name
-    # if is_file_exists(font_name, font_path):
-    #     return font_path + font_name
-    # print(1)
-    # return None
 
 
 def is_file_exists(filename, file_path):

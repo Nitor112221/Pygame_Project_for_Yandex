@@ -12,7 +12,7 @@ pygame.init()
 
 default_options = tools.load_default_options()
 settings = tools.load_user_options()
-# Теперь user_options содержит значения из options.txt, и отсутствующие настройки добавлены из default_options
+# Теперь settings содержит значения из options.txt, и отсутствующие настройки добавлены из default_options.txt
 # Сохранение обновленных настроек в файл options.txt
 tools.save_user_options(settings)
 
@@ -27,12 +27,14 @@ virtual_surface = pygame.Surface((1920, 1080), pygame.SRCALPHA)
 # переменная в которой будет храниться текущая сцена
 current_scene = None
 
+# инициализация музыки в меню
 pygame.mixer.music.load('data/music_and_sound/background_music_for_menu.mp3')
 pygame.mixer.music.play(-1)
 global_variable.is_music_play = True
 pygame.mixer.music.set_volume(global_variable.volume_sound_background)
 
 
+# функция переключения сцен
 def switch_scene(scene):
     global current_scene
     current_scene = scene
@@ -53,6 +55,8 @@ while current_scene is not None:
     elif current_scene == 'game_scene':
         pygame.mixer.music.stop()
         switch_scene(game_scene)
+
+    # запуск текущей сцены
     current_scene(screen, virtual_surface, switch_scene, settings)
 
 pygame.quit()

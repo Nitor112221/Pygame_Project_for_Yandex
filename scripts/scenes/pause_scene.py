@@ -26,6 +26,7 @@ class Button(pygame.sprite.Sprite):
 
 class PauseScene:
     def __init__(self, surface: pygame.Surface, settings: dict):
+        # создание полупрозрачного меню паузы
         self.screen = pygame.Surface((surface.get_width() * 0.6, surface.get_height() * 0.6), pygame.SRCALPHA)
         self.surface = surface
         scene_surface = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
@@ -33,6 +34,8 @@ class PauseScene:
         scene_surface.set_alpha(150)
         self.screen.blit(scene_surface, (0, 0))
         pygame.draw.rect(self.screen, (255, 255, 255), self.screen.get_rect(), width=1, border_radius=20)
+
+        # создание кнопок на меню паузы
         self.button_continue = Button(int(self.screen.get_width() * 0.5 - 40), int(self.screen.get_height() * 0.3),
                                       'Сontinue',
                                       settings)
@@ -45,6 +48,7 @@ class PauseScene:
         self.surface.blit(self.screen, (self.surface.get_width() * 0.2, self.surface.get_height() * 0.2))
 
     def update(self, mos_pos: tuple[int, int], switch_scene) -> None or str:
+        # обработка нажатий по кнопкам
         if self.surface.get_width() * 0.2 <= mos_pos[0] < self.surface.get_width() * 0.8 and \
                 self.surface.get_height() * 0.2 <= mos_pos[1] < self.surface.get_height() * 0.8:
             if self.button_map.rect.collidepoint(mos_pos[0] - self.surface.get_width() * 0.2,

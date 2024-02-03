@@ -1,11 +1,11 @@
 import pygame
 
 from scripts.entity.Entity import Entity
-import scripts.tools as tools
 from scripts.entity.weapon import Weapon
 
 
-def intersection(ax1: int, ay1: int, ax2: int, ay2: int, bx1: int, by1: int, bx2: int, by2: int):
+# функция проверки пересечения 2 отрезков (вводяться координаты концов отрезков)
+def intersection(ax1: int, ay1: int, ax2: int, ay2: int, bx1: int, by1: int, bx2: int, by2: int) -> bool:
     v1 = (bx2 - bx1) * (ay1 - by1) - (by2 - by1) * (ax1 - bx1)
     v2 = (bx2 - bx1) * (ay2 - by1) - (by2 - by1) * (ax2 - bx1)
     v3 = (ax2 - ax1) * (by1 - ay1) - (ay2 - ay1) * (bx1 - ax1)
@@ -16,20 +16,24 @@ def intersection(ax1: int, ay1: int, ax2: int, ay2: int, bx1: int, by1: int, bx2
 class Enemy(Entity):
     def __init__(self, pos_x: int, pos_y: int, animation: dict, image: pygame.Surface, *group):
         super().__init__(image, pos_x, pos_y, animation, *group)
+        # переопределение параметров и добавление новых исключителньо для врагов
         self.sight_distance = 8 * 15
-        self.irascibilis = False
+        self.irascibilis = False  # заагрен или нет
+        # хпбар
         self.heal_bar = pygame.Surface((self.rect.width - 8, 4))
         self.heal_bar.fill((35, 64, 128))  # цвет, который сделаем прозрачным
         self.heal_bar.set_colorkey((35, 64, 128))
+
         self.jump_speed = -3.5
         self.jump_cooldown = 1000
         self.jump_time = None
 
     def update(self, player, tile_group):
+        # если есть область удара и враг не мёртв обновляем состояние поражаемой области
         if self.weapon is not None and not self.is_dead:
             self.weapon.update()
             self.weapon.collide(player)
-        if self.irascibilis:
+        if self.irascibilis:  # если враг видет игрока, то идёт к нему и атакует
             if self.rect.x + 12 <= player.rect.right and self.rect.right - 12 >= player.rect.x:
                 self.x_speed = 0
                 if not self.attacking:
@@ -53,6 +57,7 @@ class Enemy(Entity):
             self.x_speed = 0
 
         super().update(tile_group)
+        # проверка на то, видет ли враг игрока
         if ((abs(self.rect.centerx - player.rect.x) ** 2) + (
                 abs(self.rect.centery - player.rect.y) ** 2)) ** 0.5 <= self.sight_distance:
             for sprite in tile_group:

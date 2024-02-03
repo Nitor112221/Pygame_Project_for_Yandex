@@ -4,6 +4,7 @@ import scripts.tools as tools
 
 class Goblin(Enemy):
     def __init__(self, pos_x, pos_y, *gruop):
+        # анимации
         animation = {'walk_left': [tools.load_image('goblin/goblin_walk/walk1.png', reverse=True),
                                    tools.load_image('goblin/goblin_walk/walk2.png', reverse=True),
                                    tools.load_image('goblin/goblin_walk/walk3.png', reverse=True),
@@ -74,7 +75,7 @@ class Goblin(Enemy):
         self.max_hp = 50
         self.hp = 50
         self.speed = 1.2
-        self.sight_distance = 8 * 20
+        self.sight_distance = 8 * 20  # радиус зрения
 
     def update(self, player, tile_group):
         if self.attacking:

@@ -74,6 +74,7 @@ class BaseHero(Entity):
             self.x_speed = 0
 
     def update(self, tile_group, enemy_group):
+        # создание атаки для игрока
         if self.weapon is not None:
             self.weapon.update()
             for enemy in enemy_group:
