@@ -11,7 +11,8 @@ from data.language import russian, english
 
 pygame.init()
 
-font = pygame.font.Font(tools.load_font('NewRocker-Regular.ttf'), 72)  # шрифт для текста меню
+font_eng = pygame.font.Font(tools.load_font('NewRocker-Regular.ttf'), 72)  # шрифт для текста меню
+font_rus = pygame.font.SysFont('Comic Sans MS', 72)  # шрифт для текста меню
 
 
 class ButtonMusic(pygame.sprite.Sprite):
@@ -65,8 +66,10 @@ class Menu:  # класс отвечающий за кнопки в меню
         x, y = surface.get_width() * 0.025, surface.get_height() * 0.5
         if settings['Language'] == 'English':
             lang = english.eng
+            font = font_eng
         elif settings['Language'] == 'Русский':
             lang = russian.rus
+            font = font_rus
 
         for i, option in enumerate(self.option_surflaces):  # проходимся по всем повехностям
             # создаём прямоугольник описывающий текст2
@@ -90,8 +93,10 @@ class Menu:  # класс отвечающий за кнопки в меню
         x, y = surf.get_width() * 0.025, surf.get_height() * 0.5
         if settings['Language'] == 'English':
             lang = english.eng
+            font = font_eng
         elif settings['Language'] == 'Русский':
             lang = russian.rus
+            font = font_rus
 
         for i, option in enumerate(self.option_surflaces):  # проходимся по всем повехностям
             # создаём прямоугольник описывающий текст2
