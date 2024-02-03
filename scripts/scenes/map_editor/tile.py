@@ -62,7 +62,7 @@ class Tile:
             tile.image = scaled_image
             tile.rect = tile.image.get_rect()
             tile.rect.x, tile.rect.y = current_index * self.cell_size + current_index * self.left + 10 + self.shift_x, \
-                self.screen_height - self.cell_size - self.bottom
+                self.screen.get_height() - self.cell_size - self.bottom
             if current_index == 0:
                 self.last_left_coorx = tile.rect.x
             current_index += 1

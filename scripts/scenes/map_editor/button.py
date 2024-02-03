@@ -21,12 +21,14 @@ class Button:
         }
 
     def render(self):
+        self.group = pygame.sprite.Group()
         for key, value in self.tile_images.items():
             btn = pygame.sprite.Sprite(self.group)
             scaled_image = pygame.transform.scale(value, (self.width, self.height))
             btn.image = scaled_image
             btn.rect = btn.image.get_rect()
-            btn.rect.x, btn.rect.y = self.coor_x, self.coor_y
+            btn.rect.x = self.screen.get_width() - self.width - self.right
+            btn.rect.y = self.screen.get_height() - self.height - self.bottom
         self.group.draw(self.screen)
 
     def chek_clicked(self, coords):
