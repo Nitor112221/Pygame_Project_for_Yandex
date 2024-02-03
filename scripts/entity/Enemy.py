@@ -43,11 +43,11 @@ class Enemy(Entity):
                     self.weapon = Weapon(self, 'hummer')
                     self.speed = 0.5
                 else:
-                    self.speed = 1.5
+                    self.speed = 1
             elif player.rect.right < self.rect.x + 12:
                 self.x_speed = -self.speed
             elif self.rect.right + 12 < player.rect.x:
-                self.x_speed = self.speed / 3
+                self.x_speed = self.speed
             else:
                 self.x_speed = 0
             if self.rect.bottom > player.rect.bottom and self.jump_time is None:
@@ -55,8 +55,9 @@ class Enemy(Entity):
                 self.jump_time = pygame.time.get_ticks()
         else:
             self.x_speed = 0
-
+        print(self.rect.x)
         super().update(tile_group)
+        print(self.x_speed, self.rect.x)
         # проверка на то, видет ли враг игрока
         if ((abs(self.rect.centerx - player.rect.x) ** 2) + (
                 abs(self.rect.centery - player.rect.y) ** 2)) ** 0.5 <= self.sight_distance:

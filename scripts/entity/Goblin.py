@@ -74,7 +74,7 @@ class Goblin(Enemy):
         self.attack_cooldown = 1500
         self.max_hp = 50
         self.hp = 50
-        self.speed = 1.2
+        self.speed = 1
         self.sight_distance = 8 * 20  # радиус зрения
 
     def update(self, player, tile_group):

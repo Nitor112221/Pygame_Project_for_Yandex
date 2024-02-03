@@ -59,7 +59,6 @@ class Entity(pygame.sprite.Sprite):
             self.direction = 'right'
         elif self.x_speed < 0:
             self.direction = 'left'
-
         # соприкосновение с шипами
         if not self.invulnerability:
             for sprite in tile_group:
