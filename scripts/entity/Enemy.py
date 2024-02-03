@@ -33,8 +33,8 @@ class Enemy(Entity):
         if self.weapon is not None and not self.is_dead:
             self.weapon.update()
             self.weapon.collide(player)
-        if self.irascibilis:  # если враг видет игрока, то идёт к нему и атакует
-            if self.rect.x + 12 <= player.rect.right and self.rect.right - 12 >= player.rect.x:
+        if self.irascibilis and not self.is_dead:  # если враг видет игрока, то идёт к нему и атакует
+            if self.rect.x + 12 <= player.rect.right and self.rect.right + 12 >= player.rect.x:
                 self.x_speed = 0
                 if not self.attacking:
                     self.attacking = True
