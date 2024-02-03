@@ -30,8 +30,9 @@ def save_progress():
 
 
 def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_scene, settings: dict) -> None:
-    # создаём новую виртуальную поверхность размерами 48 на 24 игровых тайла
     pygame.mixer.music.stop()
+    # создаём новую виртуальную поверхность размерами 48 на 24 игровых тайла
+
     virtual_surface = pygame.Surface((384, 192))
 
     # ограничение по фпс
@@ -44,15 +45,18 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     enemy = pygame.sprite.Group()
+    # полезные флаги
     dead_scene = None
     is_activity = True
     is_pause = False
     pause_scene = None
-    # загрузка 1 лвл, создание игрока и базового перемещения камеры
+
+    # загрузка лвла, создание игрока и базового перемещения камеры
     level_x, level_y, orientation_tile, player_pos, goblins = tools.generate_level(
         tools.load_level(global_variable.current_level),
         (all_sprites, tiles_group))
     player = BaseHero(player_pos[0], player_pos[1], settings, all_sprites, player_group)
+    # размещение врагов по уровню
     for coords in goblins:
         Goblin(int(coords[0]), int(coords[1]), all_sprites, enemy)
     camera = Camera((level_x, level_y), virtual_surface.get_size(), orientation_tile)
@@ -150,6 +154,7 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
 
         if player.rect.x >= virtual_surface.get_width():
             save_progress()
+            global_variable.is_music_play = False
             running = False
             switch_scene('world_map')
 
