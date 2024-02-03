@@ -27,6 +27,12 @@ virtual_surface = pygame.Surface((1920, 1080), pygame.SRCALPHA)
 # переменная в которой будет храниться текущая сцена
 current_scene = None
 
+# Загрузка изображения иконки
+icon = tools.load_image('icon.png')
+
+# Установка иконки для окна
+pygame.display.set_icon(icon)
+
 # инициализация музыки в меню
 pygame.mixer.music.load('data/music_and_sound/background_music_for_menu.mp3')
 pygame.mixer.music.play(-1)
