@@ -35,6 +35,9 @@ class Board:
     def set_view(self, left, top, size) -> None:
         """
         Функция изменения основных параметров доски
+        :param left: int
+        :param top: int
+        :param size: int
         :return: None
         """
         self.top = left
@@ -44,6 +47,7 @@ class Board:
     def render(self, current_tile=None) -> None:
         """
         Функция отрисовки всех элементов доски
+        :param current_tile: pygame.sprite.Sprite
         :return: None
         """
         coordinate = []
@@ -143,6 +147,7 @@ class Board:
     def delete_tile(self, coor) -> None:
         """
         Функция удаления нарисованного тайла
+        :param coor:  tuple
         :return: None
         """
         for col in range(len(self.coordinate_cell)):

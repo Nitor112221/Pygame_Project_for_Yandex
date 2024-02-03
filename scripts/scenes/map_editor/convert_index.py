@@ -3,6 +3,7 @@ import scripts.tools as tools
 
 class ConvertTile:
     def __init__(self):
+        # для удобства храним все спрайты в общем словаре: который импортируем
         self.tile_images = {
             '1': [tools.load_image('platform/platform.png'), '1'],
             '2': [tools.load_image('platform/platform_horizontal.png'), '2'],
@@ -36,14 +37,24 @@ class ConvertTile:
             '30': [tools.load_image('goblin/goblin_attack/attack1.png'), 'g']
         }
 
-    def return_symbol(self, index):
+    def return_symbol(self, index) -> str:
+        """
+        Метод конвертирования индекса в символ блока
+        :param index: int
+        :return: str
+        """
         count = 0
         for key, value in self.tile_images.items():
             if index == count:
                 return value[1]
             count += 1
 
-    def return_index(self, symbol):
+    def return_index(self, symbol) -> int:
+        """
+        Метод конвертирования символа в индекс блока
+        :param symbol: str
+        :return: int
+        """
         count = 0
         for key, value in self.tile_images.items():
             if symbol == value[1]:

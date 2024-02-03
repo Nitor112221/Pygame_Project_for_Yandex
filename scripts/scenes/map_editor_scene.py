@@ -35,7 +35,7 @@ class EditorScene:
         self.last_coor_board = (0, 0)
         self.focus_board = None
         # Имя файла, для сохранения уровня
-        self.filename = 'level_2'
+        self.filename = 'level_3'
         # Инстансы классов доски, тайла, кнопки
         self.notification = Notification(self.screen)
         self.convert_tile = ConvertTile()
@@ -60,6 +60,7 @@ class EditorScene:
     def select_tile(self, index) -> None:
         """
         Функция переопределения текущего тайла
+        :param index: int
         :return: None
         """
         index = index
@@ -71,6 +72,8 @@ class EditorScene:
     def update_cursor(self, index=None, value_visible=True) -> None:
         """
         Функция переопределения состояния курсора
+        :param index: int
+        :param value_visible: bool
         :return: None
         """
         pygame.mouse.set_visible(value_visible)
@@ -174,6 +177,7 @@ class EditorScene:
                         else:
                             self.prewiew_cursor = True
 
+                    # Обработка цифр реализована таким образом для визуальности и удобства встраивания новых методов
                     elif event.key == pygame.K_1:
                         index = 0
                         self.select_tile(index)
@@ -294,6 +298,7 @@ class EditorScene:
     def save_board_file(self, filename) -> None:
         """
         Функция сохранения уровня в файл
+        :param filename: str
         :return: None
         """
         file_path = 'data/levels/' + filename
