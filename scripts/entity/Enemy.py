@@ -55,9 +55,7 @@ class Enemy(Entity):
                 self.jump_time = pygame.time.get_ticks()
         else:
             self.x_speed = 0
-        print(self.rect.x)
         super().update(tile_group)
-        print(self.x_speed, self.rect.x)
         # проверка на то, видет ли враг игрока
         if ((abs(self.rect.centerx - player.rect.x) ** 2) + (
                 abs(self.rect.centery - player.rect.y) ** 2)) ** 0.5 <= self.sight_distance:
