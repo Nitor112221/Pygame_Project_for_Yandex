@@ -60,6 +60,8 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     level_x, level_y, orientation_tile, player_pos, goblins = tools.generate_level(
         tools.load_level(global_variable.current_level),
         (all_sprites, tiles_group))
+    if player_pos is None:
+        player_pos = (0, 0)
     player = BaseHero(player_pos[0], player_pos[1], settings, all_sprites, player_group)
     # размещение врагов по уровню
     for coords in goblins:
