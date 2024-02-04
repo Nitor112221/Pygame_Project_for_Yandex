@@ -141,7 +141,8 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     menu.append_option('Play', open_game_scene)  # запускает игру
     menu.append_option('Control', open_control_scene)  # открывает окно просмотра управления
     menu.append_option('Language', open_language_scene)  # открывает окно выбора языка
-    menu.append_option('Map editor', open_editor_scene)  # открывает окно создания карт
+    if settings['Develop'] == 'True':
+        menu.append_option('Map editor', open_editor_scene)  # открывает окно создания карт
     menu.append_option('Exit', lambda: 'Exit')  # выполняет выход из игры
 
     # загружаем задний фон
