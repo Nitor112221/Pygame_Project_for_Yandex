@@ -20,7 +20,11 @@ class Button:
             1: tools.load_image('map_editor/menu_buttons/editor_back.png')
         }
 
-    def render(self):
+    def render(self) -> None:
+        """
+        Метод отрисовки всех кнопок
+        :return: None
+        """
         self.group = pygame.sprite.Group()
         for key, value in self.tile_images.items():
             btn = pygame.sprite.Sprite(self.group)
@@ -32,6 +36,11 @@ class Button:
         self.group.draw(self.screen)
 
     def chek_clicked(self, coords):
+        """
+        Метод проверки нажатия на кнопку редактора
+        :param coords: tuple
+        :return: None
+        """
         for sprite in self.group:
             if sprite.rect.collidepoint(coords):
                 return sprite

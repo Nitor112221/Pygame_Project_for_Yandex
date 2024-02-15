@@ -9,7 +9,13 @@ class Cursor:
         self.list_cursors = [self.hand_cursor]  # [...] - можно добавить еще много разных курсоров
         self.screen = screen
 
-    def prewiew(self, index, position_mouse):
+    def prewiew(self, index, position_mouse) -> None:
+        """
+        Метод отображение курсора в редакторе карт
+        :param index: int
+        :param position_mouse: tuple
+        :return: None
+        """
         group_cursors = pygame.sprite.Group()
         position_mouse_x = position_mouse[0]
         position_mouse_y = position_mouse[1]

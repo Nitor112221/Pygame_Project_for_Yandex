@@ -47,8 +47,13 @@ class Tile:
             '10.': tools.load_image('spike/spike_classic.png')
         }
 
-    # Метод отрисовки всех тайлов на экране
-    def render(self, current_index_tile):
+    def render(self, current_index_tile) -> None:
+        """
+        Метод отрисовки всех тайлов на экране
+        :param current_index_tile: int
+        :return: None
+        """
+
         # Необхлодимо очистить группу, чтобы внести спрайы с новыми координатами и отрисовать их
         self.tile_group = pygame.sprite.Group()
         current_index = 0
@@ -75,8 +80,12 @@ class Tile:
             if None not in (self.last_coor_x, self.last_coor_y):
                 self.screen.blit(self.additional_surface, (self.last_coor_x - 5, self.last_coor_y - 5))
 
-    # Метод для проверки нажатия на тайл
-    def chek_clicked(self, coords):
+    def chek_clicked(self, coords) -> pygame.sprite.Sprite or None:
+        """
+        Метод для проверки нажатия на тайл
+        :param coords: tuple
+        :return: pygame.sprite.Sprite or None
+        """
         current_index_tile = 0
         for sprite in self.tile_group:
             if sprite.rect.collidepoint(coords):
@@ -92,8 +101,12 @@ class Tile:
             current_index_tile += 1
         return None
 
-    # Метод возврата тайла по текущему индексу для дальнейших действий
-    def return_sprite(self, index):
+    def return_sprite(self, index) -> pygame.sprite.Sprite:
+        """
+        Метод возврата тайла по текущему индексу для дальнейших действий
+        :param index: int
+        :return: pygame.sprite.Sprite
+        """
         count = 0
         for sprite in self.tile_group:
             if index == count:
