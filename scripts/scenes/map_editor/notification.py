@@ -40,7 +40,11 @@ class Notification:
         self.font = pygame.font.Font(self.font_name, 15)
         self.text_render = self.font.render(self.text, True, self.text_color)
 
-    def render(self):
+    def render(self) -> None:
+        """
+        Метод отображения уведомлений
+        :return: None
+        """
         self.elapsed_time = pygame.time.get_ticks() - self.start_time
         if self.elapsed_time < 2000:
             # Отрисовываем все эдементы

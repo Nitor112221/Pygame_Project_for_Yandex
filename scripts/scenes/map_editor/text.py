@@ -14,7 +14,11 @@ class Text:
         self.font_name = tools.load_font(font_name)
         self.font = pygame.font.Font(self.font_name, 15)
 
-    def render(self, coor, focus):
+    def render(self, coor, focus) -> None:
+        """
+        Метод отрисовки текста
+        :return: None
+        """
         if focus:
             text = f'{coor[0]};{coor[1]}'
         else:
