@@ -15,7 +15,7 @@ def load_image(name: str, colorkey=None, reverse=False) -> pygame.Surface:  # ф
     :return: pygame.Surface
     """
     # Полный путь к изображению
-    fullname = os.path.join('data/images', name)
+    fullname = os.path.join('data\\images', name)
 
     # Проверка существования файла
     if not os.path.isfile(fullname):
