@@ -1,13 +1,13 @@
 import sys
 import time
 import pygame
-from scripts.scenes.map_editor.tile import Tile
-from scripts.scenes.map_editor.board import Board
-from scripts.scenes.map_editor.button import Button
-from scripts.scenes.map_editor.text import Text
-from scripts.scenes.map_editor.cursor import Cursor
-from scripts.scenes.map_editor.convert_index import ConvertTile
-from scripts.scenes.map_editor.notification import Notification
+from logic.scenes.map_editor.tile import Tile
+from logic.scenes.map_editor.board import Board
+from logic.scenes.map_editor.button import Button
+from logic.scenes.map_editor.text import Text
+from logic.scenes.map_editor.cursor import Cursor
+from logic.scenes.map_editor.convert_index import ConvertTile
+from logic.scenes.map_editor.notification import Notification
 
 
 # Главный класс сцены редактора уровней

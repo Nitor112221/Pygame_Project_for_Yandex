@@ -1,11 +1,11 @@
 # загружаем нужные библиотеки и модули
 import pygame
-from scripts.scenes.menu import menu_scene
-from scripts.scenes.WorldMap_scene import world_map_scene
-from scripts.scenes.game_scene import game_scene
+from logic.scenes.menu import menu_scene
+from logic.scenes.WorldMap_scene import world_map_scene
+from logic.scenes.game_scene import game_scene
 
 import global_variable
-import scripts.tools as tools
+import logic.tools as tools
 
 # проводим инициализацию pygame
 pygame.init()

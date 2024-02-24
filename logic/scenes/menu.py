@@ -1,11 +1,11 @@
 import pygame
 
 import global_variable
-import scripts.tools as tools
-from scripts.scenes.language_menu import LanguageScene
-from scripts.scenes.control_menu import ControlScene
-from scripts.scenes.map_editor_scene import EditorScene
-from scripts.scenes.WorldMap_scene import world_map_scene
+import logic.tools as tools
+from logic.scenes.language_menu import LanguageScene
+from logic.scenes.control_menu import ControlScene
+from logic.scenes.map_editor_scene import EditorScene
+from logic.scenes.WorldMap_scene import world_map_scene
 
 from data.language import russian, english
 

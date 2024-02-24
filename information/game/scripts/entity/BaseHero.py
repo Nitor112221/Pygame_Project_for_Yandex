@@ -1,8 +1,8 @@
-from scripts.entity.Entity import Entity
+from logic.entity.Entity import Entity
 import pygame
-import scripts.tools as tools
+import logic.tools as tools
 import time
-from scripts.entity.weapon import Weapon
+from logic.entity.weapon import Weapon
 
 
 class BaseHero(Entity):

@@ -1,6 +1,6 @@
 import pygame
-import scripts.tools as tools
-from scripts.scenes.game_scene import game_scene
+import logic.tools as tools
+from logic.scenes.game_scene import game_scene
 import global_variable
 
 

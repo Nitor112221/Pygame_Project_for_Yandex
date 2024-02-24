@@ -1,7 +1,7 @@
 import pygame
 
-from scripts.entity.Entity import Entity
-from scripts.entity.weapon import Weapon
+from logic.entity.Entity import Entity
+from logic.entity.weapon import Weapon
 
 
 # функция проверки пересечения 2 отрезков (вводяться координаты концов отрезков)

@@ -1,6 +1,6 @@
 import pygame
-import scripts.tools as tools
-from scripts.scenes.map_editor.convert_index import ConvertTile
+import logic.tools as tools
+from logic.scenes.map_editor.convert_index import ConvertTile
 
 
 # Главный класс, отвечающий за тайлы для рисования

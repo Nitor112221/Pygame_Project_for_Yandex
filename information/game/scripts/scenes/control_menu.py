@@ -1,5 +1,5 @@
 import pygame
-import scripts.tools as tools
+import logic.tools as tools
 from data.language import russian, english
 
 # Инициализация Pygame

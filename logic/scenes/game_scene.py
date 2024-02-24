@@ -1,12 +1,12 @@
 import pygame
-import scripts.tools as tools
-from scripts.entity.BaseHero import BaseHero
+import logic.tools as tools
+from logic.entity.BaseHero import BaseHero
 
-from scripts.camera import Camera
+from logic.camera import Camera
 import global_variable
-from scripts.entity.Goblin import Goblin
-from scripts.scenes.dead_screen import DeadScreen
-from scripts.scenes.pause_scene import PauseScene
+from logic.entity.Goblin import Goblin
+from logic.scenes.dead_screen import DeadScreen
+from logic.scenes.pause_scene import PauseScene
 
 
 def save_progress():

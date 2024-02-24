@@ -1,5 +1,5 @@
-from scripts.entity.Enemy import Enemy
-import scripts.tools as tools
+from logic.entity.Enemy import Enemy
+import logic.tools as tools
 import os
 
 
