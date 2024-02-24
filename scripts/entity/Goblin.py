@@ -15,9 +15,9 @@ class Goblin(Enemy):
                      'idle_right': [tools.load_image('goblin\\goblin_idle\\' + i) for i in
                                     os.listdir('data/images/goblin/goblin_idle')],
                      'attack_right': [tools.load_image('goblin\\goblin_attack\\' + i, reverse=True) for i in
-                                      os.listdir('data/images/goblin/goblin_acttack')],
+                                      os.listdir('data/images/goblin/goblin_attack')],
                      'attack_left': [tools.load_image('goblin\\goblin_attack\\' + i) for i in
-                                     os.listdir('data/images/goblin/goblin_acttack')],
+                                     os.listdir('data/images/goblin/goblin_attack')],
                      'classic_left': [tools.load_image('goblin/goblin_idle/idle1.png', reverse=True)],
                      'classic_right': [tools.load_image('goblin/goblin_idle/idle1.png')],
                      'dead_right': [tools.load_image('goblin\\goblin_dead\\' + i, reverse=True) for i in
