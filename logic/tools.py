@@ -41,6 +41,26 @@ def load_image(name: str, colorkey=None, reverse=False) -> pygame.Surface:  # ф
     return image
 
 
+# загрузка статистики
+def load_statistics():
+    stats = dict()
+    try:
+        with open('data/Saves/statistics', 'r') as file:
+            for line in file.readlines():
+                key, value = line.strip().split()
+                stats[key] = int(value)
+    except Exception:
+        print('Не удалось получить статистику')
+    return stats
+
+
+# сохранение статистики в файле:
+def save_statistics(stats: dict[str, int]):
+    with open('data/Saves/statistics', 'w', encoding='UTF-8') as file:
+        for key, value in stats.items():
+            file.write(f"{key} {value}\n")
+
+
 # функция инициализации тайлов, для последующей работы с ними
 def tile_init():
     global tile_images, tile_width, tile_height

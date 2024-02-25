@@ -38,6 +38,7 @@ pygame.mixer.music.load('data/music_and_sound/background_music_for_menu.mp3')
 pygame.mixer.music.play(-1)
 global_variable.is_music_play = True
 pygame.mixer.music.set_volume(global_variable.volume_sound_background)
+global_variable.statistics = tools.load_statistics()
 
 
 # функция переключения сцен
@@ -64,5 +65,8 @@ while current_scene is not None:
 
     # запуск текущей сцены
     current_scene(screen, virtual_surface, switch_scene, settings)
+
+    # сохранение статистики
+    tools.save_statistics(global_variable.statistics)
 
 pygame.quit()

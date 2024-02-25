@@ -1,6 +1,8 @@
 import pygame
 import time
 
+import global_variable
+
 
 class Entity(pygame.sprite.Sprite):
     # базовый класс для всех существ
@@ -112,6 +114,7 @@ class Entity(pygame.sprite.Sprite):
 
         if not self.is_alive():
             if self.is_dead is False:
+                global_variable.statistics['Kills'] += 1
                 self.frame_index = 0
             self.is_dead = True
             self.status = 'dead_' + self.direction

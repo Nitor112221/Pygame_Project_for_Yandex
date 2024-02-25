@@ -1,3 +1,4 @@
+import global_variable
 from logic.entity.Entity import Entity
 import pygame
 import logic.tools as tools
@@ -47,6 +48,8 @@ class BaseHero(Entity):
         # обработка движений с неотпусканием клавиш
         if event.type == pygame.KEYDOWN:  # начинаем действие
             if event.key == getattr(pygame, f"K_{self.settings['Jump'].upper()}"):
+                if self.is_grounded:
+                    global_variable.statistics['Jumps'] += 1
                 self.jump()
             if event.key == getattr(pygame, f"K_{self.settings['Left'].lower()}"):
                 self.x_speed += -self.speed

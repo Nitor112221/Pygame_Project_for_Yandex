@@ -3,6 +3,7 @@ import pygame
 current_level = ''
 is_music_play = False
 volume_sound_background = 0
+statistics = {}
 
 
 def increase_volume(settings: dict):

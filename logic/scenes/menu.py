@@ -8,6 +8,7 @@ from logic.scenes.map_editor_scene import EditorScene
 from logic.scenes.WorldMap_scene import world_map_scene
 
 from data.language import russian, english
+from logic.scenes.statistics_menu import StatisticsScene
 
 pygame.init()
 
@@ -63,7 +64,7 @@ class Menu:  # класс отвечающий за кнопки в меню
     def draw(self, surface: pygame.Surface, option_y_padding: int, screen: pygame.Surface, settings: dict) -> None:
         # метод отрисовки всех элементов
         # координаты расположения меню относительно виртуальнйо поверхности
-        x, y = surface.get_width() * 0.025, surface.get_height() * 0.5
+        x, y = surface.get_width() * 0.025, surface.get_height() * 0.4
         if settings['Language'] == 'English':
             lang = english.eng
             font = font_eng
@@ -90,7 +91,7 @@ class Menu:  # класс отвечающий за кнопки в меню
 
     def check_mouse_event(self, option_y_padding, screen, surf, settings: dict):
         # метод находящий элемент на который указывает мышь
-        x, y = surf.get_width() * 0.025, surf.get_height() * 0.5
+        x, y = surf.get_width() * 0.025, surf.get_height() * 0.4
         if settings['Language'] == 'English':
             lang = english.eng
             font = font_eng
@@ -127,6 +128,11 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
         extra_scene = ControlScene(*virtual_surface.get_size(), settings)
         menu.is_action_menu = False
 
+    def open_statistics_scene() -> None:  # функция открывающая окно гайда по игре и блокирующая меню
+        nonlocal extra_scene, menu, virtual_surface
+        extra_scene = StatisticsScene(*virtual_surface.get_size(), settings)
+        menu.is_action_menu = False
+
     def open_editor_scene() -> None:  # функция открывающзая редактор карт
         nonlocal running
         running = False
@@ -140,6 +146,7 @@ def menu_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     # создание кнопок меню
     menu.append_option('Play', open_game_scene)  # запускает игру
     menu.append_option('Control', open_control_scene)  # открывает окно просмотра управления
+    menu.append_option('Statistics', open_statistics_scene)  # открывает окно просмотра статистики
     menu.append_option('Language', open_language_scene)  # открывает окно выбора языка
     if settings['Develop'] == 'True':
         menu.append_option('Map editor', open_editor_scene)  # открывает окно создания карт
