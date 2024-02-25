@@ -35,7 +35,7 @@ class EditorScene:
         self.last_coor_board = (0, 0)
         self.focus_board = None
         # Имя файла, для сохранения уровня
-        self.filename = 'level_3'
+        self.filename = 'level_1'
         # Инстансы классов доски, тайла, кнопки
         self.notification = Notification(self.screen)
         self.convert_tile = ConvertTile()

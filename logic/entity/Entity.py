@@ -6,10 +6,9 @@ class Entity(pygame.sprite.Sprite):
     # базовый класс для всех существ
     gravity = 0.135
 
-    def __init__(self, image: pygame.Surface, pos_x, pos_y, animation: dict, *group):
+    def __init__(self, image: pygame.Surface, pos_x, pos_y, *group):
         super().__init__(*group)
         self.image = image
-        self.animation = animation
         self.rect = self.image.get_rect().move(pos_x * 8, pos_y * 8)
         self.x_speed = 0
         self.y_speed = 0

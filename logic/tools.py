@@ -4,6 +4,7 @@ import sys
 import time
 
 pygame.init()
+pygame.display.set_mode((800, 500), pygame.RESIZABLE)
 
 
 def load_image(name: str, colorkey=None, reverse=False) -> pygame.Surface:  # функция загрузки изображения

@@ -14,8 +14,8 @@ def intersection(ax1: int, ay1: int, ax2: int, ay2: int, bx1: int, by1: int, bx2
 
 
 class Enemy(Entity):
-    def __init__(self, pos_x: int, pos_y: int, animation: dict, image: pygame.Surface, *group):
-        super().__init__(image, pos_x, pos_y, animation, *group)
+    def __init__(self, pos_x: int, pos_y: int, image: pygame.Surface, *group):
+        super().__init__(image, pos_x, pos_y, *group)
         # переопределение параметров и добавление новых исключителньо для врагов
         self.sight_distance = 8 * 15
         self.irascibilis = False  # заагрен или нет
