@@ -181,69 +181,45 @@ def generate_level(level, group):
     x, y = None, None  # размеры карты
     player_coords = None
     goblins = []
+    tile_info = {'1': ('platform', True),
+                 '2': ('platform_horizontal', True),
+                 '3': ('platform_vertical', True),
+                 '4': ('platform', False),
+                 '5': ('platform_horizontal', False),
+                 '6': ('platform_vertical', False),
+                 '7': ('disappearing_block1', True),
+                 '8': ('disappearing_block2', True),
+                 '9': ('disappearing_block3', True),
+                 's': ('spike', False),
+                 'd': ('dirt', True),
+                 'D': ('dirt', False),
+                 'u': ('dirtu', True),
+                 'U': ('dirtu', False),
+                 'h': ('dirth', True),
+                 'H': ('dirth', False),
+                 'l': ('dirtl', True),
+                 'L': ('dirtl', False),
+                 'r': ('dirtr', True),
+                 'R': ('dirtr', False),
+                 'q': ('dirtq', True),
+                 'Q': ('dirtq', False),
+                 'w': ('dirtw', True),
+                 'W': ('dirtw', False),
+                 'e': ('dirte', True),
+                 'E': ('dirte', False),
+                 't': ('dirtt', True),
+                 'T': ('dirtt', False)}
     for y in range(len(level)):
         for x in range(len(level[y])):
             # определяем типы клеток, их координаты и создаём на их основе тайлы
-            if level[y][x] == '1':
-                Tile('platform', x, y, *group)
-            elif level[y][x] == '2':
-                Tile('platform_horizontal', x, y, *group)
-            elif level[y][x] == '3':
-                Tile('platform_vertical', x, y, *group)
-            elif level[y][x] == '4':
-                Tile('platform', x, y, *group, is_touchable=False)
-            elif level[y][x] == '5':
-                Tile('platform_horizontal', x, y, *group, is_touchable=False)
-            elif level[y][x] == '6':
-                Tile('platform_vertical', x, y, *group, is_touchable=False)
-            elif level[y][x] == '7':
-                Tile('disappearing_block1', x, y, *group)
-            elif level[y][x] == '8':
-                Tile('disappearing_block2', x, y, *group)
-            elif level[y][x] == '9':
-                Tile('disappearing_block3', x, y, *group)
-            elif level[y][x] == 's':
-                Tile('spike', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'd':
-                Tile('dirt', x, y, *group)
-            elif level[y][x] == 'D':
-                Tile('dirt', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'u':
-                Tile('dirtu', x, y, *group)
-            elif level[y][x] == 'U':
-                Tile('dirtu', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'h':
-                Tile('dirth', x, y, *group)
-            elif level[y][x] == 'H':
-                Tile('dirth', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'l':
-                Tile('dirtl', x, y, *group)
-            elif level[y][x] == 'L':
-                Tile('dirtl', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'r':
-                Tile('dirtr', x, y, *group)
-            elif level[y][x] == 'R':
-                Tile('dirtr', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'q':
-                Tile('dirtq', x, y, *group)
-            elif level[y][x] == 'Q':
-                Tile('dirtq', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'w':
-                Tile('dirtw', x, y, *group)
-            elif level[y][x] == 'W':
-                Tile('dirtw', x, y, *group, is_touchable=False)
-            elif level[y][x] == 'e':
-                Tile('dirte', x, y, *group)
-            elif level[y][x] == 'E':
-                Tile('dirte', x, y, *group, is_touchable=False)
-            elif level[y][x] == 't':
-                Tile('dirtt', x, y, *group)
-            elif level[y][x] == 'T':
-                Tile('dirtt', x, y, *group, is_touchable=False)
-            elif level[y][x] == '@':
+            if level[y][x] == '@':
                 player_coords = (x, y)
             elif level[y][x] == 'g':
                 goblins.append((x, y))
+            elif level[y][x] == '.':
+                continue
+            else:
+                Tile(tile_info[level[y][x]][0], x, y, *group, is_touchable=tile_info[level[y][x]][1])
 
     tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры

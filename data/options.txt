@@ -1,5 +1,5 @@
 Language Русский
-Music On
+Music Off
 Upward W
 Left A
 Right D
