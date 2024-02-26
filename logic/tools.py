@@ -1,7 +1,6 @@
 import pygame
 import os
 import sys
-import time
 
 pygame.init()
 pygame.display.set_mode((800, 500), pygame.RESIZABLE)
@@ -41,6 +40,11 @@ def load_image(name: str, colorkey=None, reverse=False) -> pygame.Surface:  # ф
     return image
 
 
+# импортируем после создания функции load_image, что бы не было ошибок
+from logic.entity.Tile import Tile
+from logic.entity.Tile_Info import tile_info
+
+
 # загрузка статистики
 def load_statistics():
     stats = dict()
@@ -59,73 +63,6 @@ def save_statistics(stats: dict[str, int]):
     with open('data/Saves/statistics', 'w', encoding='UTF-8') as file:
         for key, value in stats.items():
             file.write(f"{key} {value}\n")
-
-
-# функция инициализации тайлов, для последующей работы с ними
-def tile_init():
-    global tile_images, tile_width, tile_height
-    # словарь для работы с изображениями тайлов
-    tile_images = {
-        'platform': load_image('platform/platform.png'),
-        'platform_horizontal': load_image('platform/platform_horizontal.png'),
-        'platform_vertical': load_image('platform/platform_vertical.png'),
-        'disappearing_block1': load_image('disappearing_block/disappearing_block_1.png', -2),
-        'disappearing_block2': load_image('disappearing_block/disappearing_block_2.png', -2),
-        'disappearing_block3': load_image('disappearing_block/disappearing_block_3.png', -2),
-        'spike': load_image('spike/spike_classic.png'),
-        'dirt': load_image('dirt/dirt.png'),
-        'dirtu': load_image('dirt/dirt_up.png'),
-        'dirth': load_image('dirt/dirt_down.png'),
-        'dirtl': load_image('dirt/dirt_left.png'),
-        'dirtr': load_image('dirt/dirt_right.png'),
-        'dirtq': load_image('dirt/dirt_up_left.png'),
-        'dirtw': load_image('dirt/dirt_down_left.png'),
-        'dirte': load_image('dirt/dirt_up_right.png'),
-        'dirtt': load_image('dirt/dirt_down_right.png')
-    }
-
-    tile_width = tile_height = 8  # размеры 1 тайла
-
-
-# класс описывающий тайл и его логику
-class Tile(pygame.sprite.Sprite):
-    def __init__(self, tile_type, pos_x, pos_y, *groups, is_touchable=True):
-        self.tile_type = tile_type
-        self.is_touchable = is_touchable
-        super().__init__(*groups)
-        if tile_type is not None:
-            self.image = tile_images[tile_type].copy()
-            self.rect = self.image.get_rect().move(
-                tile_width * pos_x, tile_height * pos_y)
-            if 'disappearing_block' in tile_type:  # если блок падающий, то добавляем ему доп параметры
-                self.disappearing_time = None
-                self.original_image = tile_images[tile_type].copy()  # Исходное изображение блока
-                if '1' in tile_type:
-                    self.dotted_line = load_image('disappearing_block/dotted_line_1.png')
-                elif '2' in tile_type:
-                    self.dotted_line = load_image('disappearing_block/dotted_line_2.png')
-                elif '3' in tile_type:
-                    self.dotted_line = load_image('disappearing_block/dotted_line_3.png')
-        else:  # создание ориентировочного тайла, нужного для ориентации камеры
-            self.image = tile_images['platform'].copy()
-            self.rect = pygame.Rect(0, 0, 0, 0).move(
-                tile_width * pos_x, tile_height * pos_y)
-
-    def update(self, player):
-        # метод, который добавляет разным блокам уникальное поведение (пока что есть только исчезающие блоки)
-        if 'disappearing_block' in self.tile_type:
-            if player.rect.move(0, 2).colliderect(self.rect) and not self.disappearing_time:
-                # если игрок наступил на блок, и таймер ещё не идёт запускаем таймер
-                self.disappearing_time = time.time() + 0.6
-            if self.disappearing_time is not None and time.time() >= self.disappearing_time:
-                # проверяем на то вышло ли время исчезновения
-                self.image = self.dotted_line.copy()
-                self.is_touchable = False
-            if self.disappearing_time is not None and time.time() >= self.disappearing_time + 3:
-                # Восстанавливаем изображение блока
-                self.image = self.original_image.copy()
-                self.is_touchable = True
-                self.disappearing_time = None
 
 
 default_options_file = 'data/default_options.txt'  # путь к настройкам по умолчанию
@@ -201,34 +138,6 @@ def generate_level(level, group):
     x, y = None, None  # размеры карты
     player_coords = None
     goblins = []
-    tile_info = {'1': ('platform', True),
-                 '2': ('platform_horizontal', True),
-                 '3': ('platform_vertical', True),
-                 '4': ('platform', False),
-                 '5': ('platform_horizontal', False),
-                 '6': ('platform_vertical', False),
-                 '7': ('disappearing_block1', True),
-                 '8': ('disappearing_block2', True),
-                 '9': ('disappearing_block3', True),
-                 's': ('spike', False),
-                 'd': ('dirt', True),
-                 'D': ('dirt', False),
-                 'u': ('dirtu', True),
-                 'U': ('dirtu', False),
-                 'h': ('dirth', True),
-                 'H': ('dirth', False),
-                 'l': ('dirtl', True),
-                 'L': ('dirtl', False),
-                 'r': ('dirtr', True),
-                 'R': ('dirtr', False),
-                 'q': ('dirtq', True),
-                 'Q': ('dirtq', False),
-                 'w': ('dirtw', True),
-                 'W': ('dirtw', False),
-                 'e': ('dirte', True),
-                 'E': ('dirte', False),
-                 't': ('dirtt', True),
-                 'T': ('dirtt', False)}
     for y in range(len(level)):
         for x in range(len(level[y])):
             # определяем типы клеток, их координаты и создаём на их основе тайлы
@@ -239,7 +148,8 @@ def generate_level(level, group):
             elif level[y][x] == '.':
                 continue
             else:
-                Tile(tile_info[level[y][x]][0], x, y, *group, is_touchable=tile_info[level[y][x]][1])
+                tile_info[level[y][x]][2](tile_info[level[y][x]][0], x, y, *group,
+                                          is_touchable=tile_info[level[y][x]][1])
 
     tile = Tile(None, 0, 0, group[0])  # создание ориентировочного спрайта
     # оринтеровочный tile, нужен для правильной отрисовки камеры

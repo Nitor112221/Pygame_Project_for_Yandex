@@ -44,7 +44,6 @@ def game_scene(screen: pygame.Surface, virtual_surface: pygame.Surface, switch_s
     fps = 60
 
     # подготовка для работы со спрайтами и тайлами
-    tools.tile_init()
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
