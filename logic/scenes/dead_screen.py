@@ -28,6 +28,7 @@ class Button(pygame.sprite.Sprite):
 
 class DeadScreen:
     def __init__(self, surface: pygame.Surface, settings: dict):
+        global_variable.statistics['Deads'] += 1
         # создание полупрозрачной поверхности
         self.screen = pygame.Surface((surface.get_width() * 0.6, surface.get_height() * 0.6), pygame.SRCALPHA)
         self.surface = surface

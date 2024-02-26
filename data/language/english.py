@@ -16,5 +16,6 @@ eng = {'Play': 'Play',
        'Develop': 'Develop',
        'Statistics': 'Statistics',
        'Kills': 'Kills',
-       'Jumps': 'Jumps'
+       'Jumps': 'Jumps',
+       'Deads': 'Deads'
        }
