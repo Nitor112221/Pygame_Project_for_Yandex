@@ -60,13 +60,18 @@ class Board:
                                col * self.cell_size + self.top,
                                self.cell_size,
                                self.cell_size,
-                               1)
+                               3)
                 if col == 0 and row == 0:
                     self.coor_first_cell = [(row * self.cell_size + self.left) // 10,
                                             (col * self.cell_size + self.top) // 10]
 
                 if self.board[col][row] != '.':
-                    surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))
+                    zoom = 5
+                    if self.board[col][row] == '@' or self.board[col][row] == 'g':
+                        surface = pygame.Surface((self.cell_size * zoom - 2,
+                                                  self.cell_size * zoom - 2))
+                    else:
+                        surface = pygame.Surface((self.cell_size - 2, self.cell_size - 2))
                     try:
                         image = self.convert_tile.tile_images[
                             str(self.convert_tile.return_index(self.board[col][row]) + 1)
@@ -77,12 +82,18 @@ class Board:
                         ][0]
                         image.set_alpha(180)
 
-                    scale_image = pygame.transform.scale(image, (self.cell_size - 2, self.cell_size - 2))
+                    if self.board[col][row] == '@' or self.board[col][row] == 'g':
+                        scale_image = pygame.transform.scale(image, (self.cell_size * zoom - 2,
+                                                                     self.cell_size * zoom - 2))
+                    else:
+                        scale_image = pygame.transform.scale(image, (self.cell_size - 2,
+                                                                     self.cell_size - 2))
                     surface.blit(scale_image, (0, 0))
                     self.surface.blit(surface, (row * self.cell_size + self.left + 1,
                                                 col * self.cell_size + self.top + 1))
 
-                coordinate.append((self.left + row * self.cell_size, self.top + col * self.cell_size))
+                coordinate.append((self.left + row * self.cell_size,
+                                   self.top + col * self.cell_size))
             self.coordinate_cell.append(coordinate)
             coordinate = []
 
@@ -197,14 +208,14 @@ class Board:
                             (self.coordinate_cell[i][j][1] + self.cell_size) and \
                             coor[1] < self.height - 58:
 
-                            # Добавляем координаты последнего добавленного спрайта
-                            push_eleme_to_stack = [(self.coordinate_cell[i][j][0],
-                                                     self.coordinate_cell[i][j][1]), (i, j)]
-                            if push_eleme_to_stack not in self.stack_action and current_tile is not None:
-                                self.stack_action.append(push_eleme_to_stack)
+                        # Добавляем координаты последнего добавленного спрайта
+                        push_eleme_to_stack = [(self.coordinate_cell[i][j][0],
+                                                self.coordinate_cell[i][j][1]), (i, j)]
+                        if push_eleme_to_stack not in self.stack_action and current_tile is not None:
+                            self.stack_action.append(push_eleme_to_stack)
 
-                            if current_tile is not None:
-                                self.board[i][j] = self.convert_tile.return_symbol(current_index_tile)
+                        if current_tile is not None:
+                            self.board[i][j] = self.convert_tile.return_symbol(current_index_tile)
 
                 # Если нужно просто проверить нахождении мыши внутри доски
                 else:
