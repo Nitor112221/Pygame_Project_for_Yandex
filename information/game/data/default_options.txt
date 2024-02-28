@@ -1,0 +1,8 @@
+Language Русский
+Music On
+Upward W
+Left A
+Right D
+Down S
+Jump Space
+Develop False
