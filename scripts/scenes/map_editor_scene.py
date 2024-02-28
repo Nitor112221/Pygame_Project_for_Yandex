@@ -24,6 +24,7 @@ class EditorScene:
         self.clock = pygame.time.Clock()
         pygame.mouse.set_visible(False)
         self.prewiew_cursor = True
+        self.running = True
 
         # Текущий выбранный тайл для отрисовки
         self.current_tile = None
@@ -239,7 +240,7 @@ class EditorScene:
 
     def event_editor(self, event, key_to_press):
         if event.type == pygame.QUIT:
-            running = False
+            self.running = False
             self.switch_scene(None)
         elif event.type == pygame.MOUSEMOTION:
             self.last_coordinate = event.pos
@@ -251,7 +252,7 @@ class EditorScene:
             if event.key == key_to_press:
                 self.save_board_file(self.filename)
             elif event.key == pygame.K_ESCAPE:
-                running = False
+                self.running = False
                 self.switch_scene('menu_scene')
             elif event.key == pygame.K_BACKSPACE:
                 self.board.clear_board()
@@ -276,8 +277,7 @@ class EditorScene:
         # Определение клавиш для разных операционных систем
         key_to_press = self.select_operating_system()
 
-        running = True
-        while running:
+        while self.running:
             self.check_prewiew_cursor()
 
             # Обрабатываем нажатия на различные клавиши (является ли нажатой в любой кадр игры)
