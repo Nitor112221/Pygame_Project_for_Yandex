@@ -60,7 +60,7 @@ class Board:
                                col * self.cell_size + self.top,
                                self.cell_size,
                                self.cell_size,
-                               3)
+                               1)
                 if col == 0 and row == 0:
                     self.coor_first_cell = [(row * self.cell_size + self.left) // 10,
                                             (col * self.cell_size + self.top) // 10]
