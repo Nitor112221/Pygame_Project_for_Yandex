@@ -1,8 +1,8 @@
 Language Русский
-Music Off
+Music On
 Upward W
 Left A
 Right D
 Down S
 Jump Space
-Develop True
+Develop False
