@@ -1,5 +1,4 @@
 import pygame
-import logic.tools as tools
 from logic.scenes.map_editor.convert_index import ConvertTile
 
 
@@ -33,19 +32,6 @@ class Tile:
         self.shift_x = 0
         self.last_left_coorx = 0
         self.last_right_coorx = self.screen_width
-
-        self.tile_images = {
-            '1.': tools.load_image('platform/platform.png'),
-            '2.': tools.load_image('platform/platform_horizontal.png'),
-            '3.': tools.load_image('platform/platform_vertical.png'),
-            '4.-': tools.load_image('platform/platform.png'),
-            '5.-': tools.load_image('platform/platform_horizontal.png'),
-            '6.-': tools.load_image('platform/platform_vertical.png'),
-            '7.': tools.load_image('disappearing_block/disappearing_block_1.png', -2),
-            '8.': tools.load_image('disappearing_block/disappearing_block_2.png', -2),
-            '9.': tools.load_image('disappearing_block/disappearing_block_3.png', -2),
-            '10.': tools.load_image('spike/spike_classic.png')
-        }
 
     def render(self, current_index_tile) -> None:
         """
